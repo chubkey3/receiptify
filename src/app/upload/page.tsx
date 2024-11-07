@@ -1,5 +1,6 @@
 "use client"
 
+import axios from 'axios';
 import { useState } from 'react';
 
 export default function FileUpload() {
@@ -27,7 +28,7 @@ export default function FileUpload() {
 
   const handleUpload = async () => {
     if (!file) {
-      alert('Please select a file to upload.');
+      alert('Please select a valid file to upload.');
       return;
     }
 
@@ -38,20 +39,16 @@ export default function FileUpload() {
 
     setStatusMessage("Loading...");
 
-    try {      
-      
-      response = await fetch('/api/fileupload', {
-        method: 'POST',
-        body: formData,
-      });
+    try {            
+      response = await axios.post('/api/upload', formData);
+            
     } catch (error) {      
       setStatusMessage(`File Upload Failed!\nStatus Code: ${response?.status}\n Error: ${error}`);
       
     }
 
-    if (response && response.status === 201) {
-      const result = await response.json();
-      setStatusMessage(`File uploaded successfully with path "${result.path}"!`);
+    if (response && response.status === 200) {      
+      setStatusMessage(`File uploaded successfully with data "${JSON.stringify(response.data)}"!`);
     } else {
       setStatusMessage(`File Upload Failed!\nStatus Code: ${response?.status}`);
     }    

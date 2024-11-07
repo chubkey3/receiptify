@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Storage } from '@google-cloud/storage';
 import { randomUUID } from 'crypto';
-import { getEnvVariable } from '@/app/util/getEnvironmentalVariable';
+import { getEnvVariable, imgToPDF, pdfExtractor } from '@/app/util/util';
 
 
-// The ID of your GCS bucket
 const bucketName = getEnvVariable("PROJECT_NAME");
-
-// Creates a client
 const storage = new Storage();
 
 
@@ -36,9 +33,12 @@ export async function POST(request: NextRequest) {
     }
     
     try {
-        const result = await uploadFile(file);
+        const result = await uploadFile(file);        
 
-        return NextResponse.json({ path: result}, {status: 201});
+        const filePath = await imgToPDF(result.split('/')[1]);
+        const receiptData = await pdfExtractor(filePath);                        
+
+        return NextResponse.json({ data: receiptData}, {status: 200});
 
     } catch (error) {
         return NextResponse.json({ error: error}, { status: 500})
