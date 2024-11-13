@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Storage } from '@google-cloud/storage';
 import { randomUUID } from 'crypto';
-import { getEnvVariable, imgToPDF, pdfExtractor } from '@/app/util/util';
+import { getEnvVariable } from '@/util/getEnvironmentalVariable';
+import { imgToPDF } from '@/util/imgToPDF';
+import { pdfExtractor } from '@/util/pdfExtractor';
 
 
 const bucketName = getEnvVariable("PROJECT_NAME");
