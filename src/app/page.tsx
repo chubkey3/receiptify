@@ -1,10 +1,24 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { auth } from "@/init/firebaseAdminAuthInit";
 
-export default function Home() {
+export default async function Home() {      
+  
+  const token = (await cookies()).get('token')?.value;  
+
+  try {
+    await auth.verifyIdToken(token ?? '');
+  } catch (err) {
+    err; // prevent lint from complaining
+    redirect('/login');
+  }    
+    
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
+      <main className={styles.main}>        
         <Image
           className={styles.logo}
           src="/next.svg"
