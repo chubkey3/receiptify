@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const decodedToken = await auth.verifyIdToken(token);
     const uid = decodedToken.uid;
         
-    const result = await db.execute(`SELECT * FROM users WHERE uid='${uid}';`)
+    const result = await db.execute(`SELECT * FROM user WHERE uid='${uid}';`)
 
     console.log(result);
 
