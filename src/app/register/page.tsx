@@ -1,6 +1,6 @@
 "use client"
 import styles from "../page.module.css";
-import { registerWithEmailAndPassword } from '@/util/authService';
+import { deleteCurrentUser, registerWithEmailAndPassword } from '@/util/authService';
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
@@ -12,20 +12,24 @@ export default function Register() {
   const [password, setPassword] = useState('');  
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      registerWithEmailAndPassword(email, password, userName).then((user) => {
-        user.getIdToken().then((token) => {
-          document.cookie = `token=${token}; path=/; max-age=604800`;
-          axios.post('/api/user/register').then(() => {            
-            router.push('/');
-          })  
-        })        
-      })      
-    } catch (error) {
+    e.preventDefault();    
+    registerWithEmailAndPassword(email, password, userName)
+    .then((user) => {
+      user.getIdToken().then((token) => {
+        document.cookie = `token=${token}; path=/; max-age=604800`;
+        axios.post('/api/user/register')
+        .then(() => {            
+          router.push('/');            
+        })
+        .catch(() => {            
+          document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+          deleteCurrentUser(user);          
+        })
+      })        
+    })
+    .catch((error) => {
       alert(error);
-    }
-    
+    })    
   };  
 
   
