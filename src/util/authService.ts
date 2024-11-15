@@ -1,5 +1,5 @@
 // src/authService.js
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendEmailVerification, deleteUser, User } from 'firebase/auth';
 import { auth } from '@/init/firebaseAuthInit';
 
 export const registerWithEmailAndPassword = async (email: string, password: string, displayName: string) => {
@@ -14,6 +14,17 @@ export const registerWithEmailAndPassword = async (email: string, password: stri
     throw error;
   }
 };
+
+export const deleteCurrentUser = async (user: User) => {
+  try {
+    
+    await deleteUser(user);
+            
+  } catch (error) {
+    console.log('Error deleting:', error)
+    throw error;
+  }
+}
 
 export const loginWithEmailAndPassword = async (email: string, password: string) => {
   try {
