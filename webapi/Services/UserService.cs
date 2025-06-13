@@ -1,6 +1,7 @@
 using webapi.Models;
 using webapi.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace webapi.Services;
 
@@ -14,24 +15,22 @@ public class UserService
 
     public IEnumerable<User> GetAll()
     {
-         return _context.Users
-        .AsNoTracking()
-        .ToList();
+        return _context.Users
+       .AsNoTracking()
+       .ToList();
     }
 
     public User? GetById(string id)
     {
         return _context.Users        
-        .Include(p => p.Expenses)
-        .Include(p => p.Receipts)
         .AsNoTracking()
         .SingleOrDefault(p => p.Uid == id);
     }
 
     public User? Create(User newUser)
     {
-          _context.Users.Add(newUser);
-         _context.SaveChanges();
+        _context.Users.Add(newUser);
+        _context.SaveChanges();
 
         return newUser;
     }
@@ -43,6 +42,15 @@ public class UserService
         {
             _context.Users.Remove(userToDelete);
             _context.SaveChanges();
-        }        
+        }
+    }
+
+    public IEnumerable<Expense> GetExpenses(string userId)
+    {
+         return _context.Expenses
+        .Where(e => e.Uid == userId)
+       .AsNoTracking()
+       .ToList();        
+            
     }
 }

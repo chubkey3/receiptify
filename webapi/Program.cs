@@ -18,6 +18,7 @@ builder.Services.AddOpenApi();
 
 // add contexts
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ExpenseService>();
 
 var app = builder.Build();
 
@@ -32,5 +33,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.CreateDbIfNotExists();
 
 app.Run();

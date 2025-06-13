@@ -9,7 +9,7 @@ namespace webapi.Controllers;
 public class UserController : ControllerBase
 {
     UserService _service;
-    
+
     public UserController(UserService service)
     {
         _service = service;
@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public IEnumerable<User> GetAll()
     {
-        return _service.GetAll();        
+        return _service.GetAll();
     }
 
     [HttpGet("{id}")]
@@ -26,7 +26,7 @@ public class UserController : ControllerBase
     {
         var user = _service.GetById(id);
 
-        if(user is not null)
+        if (user is not null)
         {
             return user;
         }
@@ -44,13 +44,13 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = user!.Uid }, user);
     }
 
-    
+
     [HttpDelete("{id}")]
     public IActionResult Delete(string id)
     {
         var user = _service.GetById(id);
 
-        if(user is not null)
+        if (user is not null)
         {
             _service.DeleteById(id);
             return Ok();
@@ -59,5 +59,29 @@ public class UserController : ControllerBase
         {
             return NotFound();
         }
+    }
+    
+     [HttpGet("{userId}/expenses")]
+    public IActionResult GetExpenses(string userId)
+    {
+        var user = _service.GetById(userId);
+
+        if (user is not null)
+        {
+
+            var expenses = _service.GetExpenses(userId);
+
+            return Ok(expenses);
+        }
+        else
+        {
+            return NotFound();
+        }
+
+        
+
+        
+
+        
     }
 }
