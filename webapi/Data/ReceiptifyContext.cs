@@ -8,13 +8,13 @@ namespace webapi.Data;
 
 
 
-public partial class TestContext : DbContext
+public partial class ReceiptifyContext : DbContext
 {
-    public TestContext()
+    public ReceiptifyContext()
     {
     }
 
-    public TestContext(DbContextOptions<TestContext> options)
+    public ReceiptifyContext(DbContextOptions<ReceiptifyContext> options)
         : base(options)
     {
     }
@@ -28,7 +28,7 @@ public partial class TestContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("server=35.226.152.169;database=test;user=testing;password=123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.31-mysql"));
+        => optionsBuilder.UseMySql("server=35.226.152.169;database=receiptify;user=testing;password=123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.31-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

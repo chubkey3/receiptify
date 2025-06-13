@@ -11,7 +11,7 @@ using webapi.Data;
 
 namespace webapi.Migrations
 {
-    [DbContext(typeof(TestContext))]
+    [DbContext(typeof(ReceiptifyContext))]
     [Migration("20250612092330_test_migration")]
     partial class test_migration
     {
