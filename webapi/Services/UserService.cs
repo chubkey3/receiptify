@@ -1,7 +1,6 @@
 using webapi.Models;
 using webapi.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 
 namespace webapi.Services;
 

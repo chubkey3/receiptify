@@ -33,7 +33,7 @@ namespace webapi.Data
             var expense2 = new Expense { ExpenseId = 2, TotalAmount = new decimal(49.95), ExpenseDate = new DateTime(2024, 6, 10, 9, 10, 0), Uid = "i01Fwv413PMylKa4LrKNnvBiX8m2", ReceiptId = 2, SupplierId = 2 };
             var expense3 = new Expense { ExpenseId = 3, TotalAmount = new decimal(10.95), ExpenseDate = new DateTime(2024, 6, 15, 10, 30, 0), Uid = "Ok6yVBpq1WcgMac4ycOGtdmmZtZ2", ReceiptId = 3, SupplierId = 3 };
 
-            
+
             context.Users.Add(userJamal69);
             context.Users.Add(userJamal);
             context.Users.Add(userLink);
@@ -51,6 +51,8 @@ namespace webapi.Data
             context.Expenses.Add(expense3);
 
             context.SaveChanges();
+
+            Console.WriteLine("Seeded Database!");
         }
     }
 }
