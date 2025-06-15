@@ -19,6 +19,7 @@ builder.Services.AddOpenApi();
 
 // add services
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ReceiptService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<FirebaseAuthService>();
 builder.Services.AddScoped<UploadService>();
