@@ -15,12 +15,13 @@ public class ParseCookieMiddleware
         if (context.Request.Cookies.TryGetValue("token", out var cookieValue))
         {
             try
-            {            
-                var parsedUserId = await ParseCookie(cookieValue);                
-                context.Items["userId"] = parsedUserId;
-            } catch (Exception)
             {
-                 // Parsing failed (e.g., invalid format, expired token, etc.)
+                var parsedUserId = await ParseCookie(cookieValue);
+                context.Items["userId"] = parsedUserId;                                
+            }
+            catch (Exception)
+            {
+                // Parsing failed (e.g., invalid format, expired token, etc.)
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await context.Response.WriteAsync("Expired cookie or invalid token");
                 return; // stop the pipeline

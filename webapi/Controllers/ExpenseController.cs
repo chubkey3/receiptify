@@ -32,12 +32,12 @@ public class ExpenseController : ControllerBase
         var expense = _service.GetById(id);
 
         if (expense is not null)
-        {
+        {            
             if (expense.Uid != userId)
-            {
+            {                
                 return Unauthorized("You do not have permission to view this expense.");
             }
-            
+
             return expense;
         }
         else

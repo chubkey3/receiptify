@@ -21,8 +21,30 @@ public class ExpenseService
 
     public Expense? GetById(int id)
     {
-        return _context.Expenses        
+        return _context.Expenses
         .AsNoTracking()
+        .Include(e => e.Supplier) // Include related Supplier
+        .Include(e => e.Receipt) // Include related Receipt
+        .Select(e => new Expense
+        {
+            ExpenseId = e.ExpenseId,
+            TotalAmount = e.TotalAmount,
+            ExpenseDate = e.ExpenseDate,   
+            Uid = e.Uid,
+            SupplierId = e.SupplierId,
+            ReceiptId = e.ReceiptId,         
+            Supplier = new Supplier
+            {
+                SupplierId = e.Supplier.SupplierId,
+                SupplierName = e.Supplier.SupplierName
+            },            
+            Receipt = e.Receipt == null ? null : new Receipt
+            {
+                ReceiptId = e.Receipt.ReceiptId,
+                ReceiptUrl = e.Receipt.ReceiptUrl,
+                UploadDate = e.Receipt.UploadDate
+            }            
+        })
         .SingleOrDefault(p => p.ExpenseId == id);
     }
 
