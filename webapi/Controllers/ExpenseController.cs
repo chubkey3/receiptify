@@ -1,21 +1,11 @@
 using webapi.Services;
 using webapi.Models;
 using Microsoft.AspNetCore.Mvc;
+using webapi.DTO;
 
 namespace webapi.Controllers;
 
-public class CreateExpenseDto
-{        
-    public decimal TotalAmount { get; set; }
-    
-    public DateTime ExpenseDate { get; set; }
 
-    public string Uid { get; set; } = null!;
-
-    public int? ReceiptId { get; set; }
-
-    public int SupplierId { get; set; }
-}
 
 [ApiController]
 [Route("[controller]")]

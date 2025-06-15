@@ -1,8 +1,12 @@
 using webapi.Services;
 using webapi.Models;
 using Microsoft.AspNetCore.Mvc;
+using webapi.DTO;
 
 namespace webapi.Controllers;
+
+
+
 
 [ApiController]
 [Route("[controller]")]
@@ -38,9 +42,17 @@ public class UserController : ControllerBase
 
 
     [HttpPost]
-    public IActionResult Create(User newUser)
+    public IActionResult Create(CreateUserDto newUser)
     {
-        var user = _service.Create(newUser);
+
+        var user = new User
+        {
+            Uid = newUser.Uid,
+            Username = newUser.Username,
+            Email = newUser.Email
+        };
+
+        _service.Create(user);
         return CreatedAtAction(nameof(GetById), new { id = user!.Uid }, user);
     }
 
@@ -60,8 +72,8 @@ public class UserController : ControllerBase
             return NotFound();
         }
     }
-    
-     [HttpGet("{userId}/expenses")]
+
+    [HttpGet("{userId}/expenses")]
     public IActionResult GetExpenses(string userId)
     {
         var user = _service.GetById(userId);
@@ -78,10 +90,10 @@ public class UserController : ControllerBase
             return NotFound();
         }
 
-        
 
-        
 
-        
+
+
+
     }
 }

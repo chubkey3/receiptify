@@ -1,18 +1,11 @@
 using webapi.Services;
 using webapi.Models;
 using Microsoft.AspNetCore.Mvc;
+using webapi.DTO;
 
 namespace webapi.Controllers;
 
-public class CreateSupplierDto
 
-
-{        
-    
-    public string SupplierName { get; set; } = null!;
-
-
-}
 
 [ApiController]
 [Route("[controller]")]

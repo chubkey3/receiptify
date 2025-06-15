@@ -1,22 +1,11 @@
 using webapi.Services;
 using webapi.Models;
 using Microsoft.AspNetCore.Mvc;
+using webapi.DTO;
 
 namespace webapi.Controllers;
 
-public class CreateReceiptDto
 
-
-{
-
-    public DateTime? UploadDate { get; set; }
-
-    public string ReceiptUrl { get; set; } = null!;
-
-    public string? UploadedBy { get; set; }    
-
-
-}
 
 [ApiController]
 [Route("[controller]")]
