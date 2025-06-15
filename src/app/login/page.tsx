@@ -1,8 +1,10 @@
 "use client"
-import styles from "../page.module.css";
+import { LoginForm } from "@/components/login-page";
 import { loginWithEmailAndPassword } from '@/util/authService';
 import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
+import { toast } from "sonner";
+import { refreshSessionCookie } from "../auth/AuthHelper";
 
 export default function Login() {    
   const router = useRouter();
@@ -11,42 +13,25 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     try {
       loginWithEmailAndPassword(email, password).then((user) => {
-        user.getIdToken().then((token) => {
-            document.cookie = `token=${token}; path=/; max-age=604800`;            
-            router.push('/');
+        user.getIdToken().then((token) => {            
+            refreshSessionCookie(token).then(() => router.push('/'));
         })
-      })
-    } catch (error) {
-      alert(error);
+      }).catch(() => toast("Invalid Login.", {position: "top-center"}))
+    } catch (error) {      
+      
     }
     
   };  
   
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-
-      <div className={styles.page}>
-    <form onSubmit={handleLogin}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit">Login</button>
-    </form>        
-    </div>
-      </main>
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <LoginForm email={email} password={password} setEmail={setEmail} setPassword={setPassword} submit={handleLogin} />
+      </div>
     </div>
   );
 }

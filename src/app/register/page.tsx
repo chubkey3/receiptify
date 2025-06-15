@@ -4,6 +4,7 @@ import { deleteCurrentUser, registerWithEmailAndPassword } from '@/util/authServ
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
+import { refreshSessionCookie } from "../auth/AuthHelper";
 
 export default function Register() {    
   const router = useRouter();
@@ -16,12 +17,13 @@ export default function Register() {
     registerWithEmailAndPassword(email, password, userName)
     .then((user) => {
       user.getIdToken().then((token) => {
-        document.cookie = `token=${token}; path=/; max-age=604800`;
-        axios.post('/api/user/register')
+        
+        refreshSessionCookie(token).then(() => router.push('/')).then(() => {
+          axios.post('/api/user/register')
         .then(() => {            
           router.push('/');            
         })
-        .catch(() => {            
+        }).catch(() => {            
           document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
           deleteCurrentUser(user);          
         })

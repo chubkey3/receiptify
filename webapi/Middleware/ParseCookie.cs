@@ -12,12 +12,25 @@ public class ParseCookieMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
 
+        var path = context.Request.Path.Value;
+
+        if (path == null)
+        {
+            return;
+        }
+        // ✅ Skip auth check for public endpoints
+        if (path.StartsWith("/session"))
+        {
+            await _next(context);
+            return;
+        }
+
         if (context.Request.Cookies.TryGetValue("token", out var cookieValue))
         {
             try
             {
                 var parsedUserId = await ParseCookie(cookieValue);
-                context.Items["userId"] = parsedUserId;                                
+                context.Items["userId"] = parsedUserId;
             }
             catch (Exception)
             {
@@ -26,11 +39,11 @@ public class ParseCookieMiddleware
                 await context.Response.WriteAsync("Expired cookie or invalid token");
                 return; // stop the pipeline
             }
-            
+
         }
         else
         {
-             // No cookie provided
+            // No cookie provided
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("Missing auth cookie");
             return; // short-circuit
