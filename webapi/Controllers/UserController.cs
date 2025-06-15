@@ -73,9 +73,17 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpGet("{userId}/expenses")]
-    public IActionResult GetExpenses(string userId)
+    [HttpGet("expenses")]
+    public IActionResult GetExpenses()
     {
+
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("User not found.");            
+        }
+
         var user = _service.GetById(userId);
 
         if (user is not null)

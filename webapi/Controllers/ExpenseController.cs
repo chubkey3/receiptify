@@ -23,14 +23,21 @@ public class ExpenseController : ControllerBase
     {
         return _service.GetAll();
     }
-
+    
     [HttpGet("{id}")]
     public ActionResult<Expense> GetById(int id)
     {
+        var userId = HttpContext.Items["userId"]?.ToString();
+        
         var expense = _service.GetById(id);
 
         if (expense is not null)
         {
+            if (expense.Uid != userId)
+            {
+                return Unauthorized("You do not have permission to view this expense.");
+            }
+            
             return expense;
         }
         else
