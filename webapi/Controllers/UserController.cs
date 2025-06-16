@@ -44,10 +44,17 @@ public class UserController : ControllerBase
     [HttpPost]
     public IActionResult Create(CreateUserDto newUser)
     {
+        
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("User not found.");            
+        }
 
         var user = new User
         {
-            Uid = newUser.Uid,
+            Uid = userId,
             Username = newUser.Username,
             Email = newUser.Email
         };
