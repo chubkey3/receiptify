@@ -26,10 +26,24 @@ builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<FirebaseAuthService>();
 builder.Services.AddScoped<UploadService>();
 
-builder.Services.AddCors(p => p.AddPolicy("testing", builder =>
+if (builder.Environment.IsDevelopment())
 {
-    builder.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-}));
+    builder.Services.AddCors(p => p.AddPolicy("CORSPolicy", builder =>
+    {
+        builder.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+    }));
+}
+else
+{
+    builder.Services.AddCors(p => p.AddPolicy("CORSPolicy", builder =>
+    {
+        // please remove url soon
+        builder.WithOrigins("https://receiptify-573080908500.us-central1.run.app").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+    }));    
+}
+
+
+
 
 var app = builder.Build();
 
@@ -53,7 +67,7 @@ app.UseMiddleware<ParseCookieMiddleware>();
 
 app.MapControllers();
 
-app.UseCors("testing");
+app.UseCors("CORSPolicy");
 
 app.CreateDbIfNotExists();
 
