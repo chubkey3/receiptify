@@ -56,13 +56,18 @@ public class ExpenseController : ControllerBase
     public IActionResult Create(CreateExpenseDto dto)
     {
         // TODO: validate uid, receiptid, and supplierid
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }        
 
         var expense = new Expense
         {
-            TotalAmount = dto.TotalAmount,
-            ExpenseDate = dto.ExpenseDate,
+            TotalAmount = dto.TotalAmount,            
             // load foreign keys
-            Uid = dto.Uid,
+            Uid = userId,
             ReceiptId = dto.ReceiptId,
             SupplierId = dto.SupplierId
         };

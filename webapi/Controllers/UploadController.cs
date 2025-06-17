@@ -31,25 +31,16 @@ public class UploadController : ControllerBase
         // 1. load credentials
         // 2. upload image to GCS
         // 3. use uid and filename to trigger workflow
-
-        string uid;
+        
         string filename;
 
         // load credentials
-        if (!Request.Cookies.TryGetValue("token", out string? token))
-        {            
-            return Unauthorized("No auth token found in cookies");
-        }
+        var userId = HttpContext.Items["userId"]?.ToString();
 
-        try
+        if (userId is null)
         {
-            var user = await _authService.VerifyTokenAsync(token);
-            uid = user.Uid;
-        }
-        catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.ExpiredIdToken)
-        {
-            return Unauthorized("Token expired");
-        }
+            return Unauthorized("Cookie not valid.");
+        }        
 
         // upload image to GCS
         if (file == null || file.Length == 0)
@@ -71,7 +62,7 @@ public class UploadController : ControllerBase
         // use uid and filename to trigger workflow
         try
         {
-            var result = await _uploadService.TriggerWorkflow(uid, filename);
+            var result = await _uploadService.TriggerWorkflow(userId, filename);
 
             return Ok(result);
         }

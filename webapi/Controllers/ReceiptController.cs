@@ -47,11 +47,10 @@ public class ReceiptController : ControllerBase
 
         var receipt = new Receipt
         {
-            ReceiptUrl = dto.ReceiptUrl,
-            UploadDate = dto.UploadDate,
+            ReceiptUrl = dto.ReceiptUrl,            
             
             // load foreign key (user.Uid) (optional)
-            UploadedBy = dto.UploadedBy            
+            UploadedBy = HttpContext.Items["userId"]?.ToString()           
         };
 
         _service.Create(receipt);
