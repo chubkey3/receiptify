@@ -45,14 +45,22 @@ public class SupplierController : ControllerBase
     {
         // TODO: validate uid, Supplierid, and supplierid
 
-        var Supplier = new Supplier
-        {            
-            SupplierName = dto.SupplierName
-        };
-
-        _service.Create(Supplier);
+        var exists = _service.GetByName(dto.SupplierName);
         
-        return CreatedAtAction(nameof(GetById), new { id = Supplier!.SupplierId }, Supplier);
+        if (exists == null)
+        {
+            var Supplier = new Supplier
+            {
+                SupplierName = dto.SupplierName
+            };
+
+            _service.Create(Supplier);
+
+            return CreatedAtAction(nameof(GetById), new { id = Supplier!.SupplierId }, Supplier);
+        }
+
+        return Ok(exists);
+
     }
 
 

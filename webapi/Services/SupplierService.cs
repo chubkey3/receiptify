@@ -26,10 +26,15 @@ public class SupplierService
         .SingleOrDefault(p => p.SupplierId == id);
     }
 
+    public Supplier? GetByName(string supplierName)
+    {
+        return _context.Suppliers.FirstOrDefault(u => u.SupplierName == supplierName);
+    }
+
     public Supplier? Create(Supplier newSupplier)
     {
-          _context.Suppliers.Add(newSupplier);
-         _context.SaveChanges();
+        _context.Suppliers.Add(newSupplier);
+        _context.SaveChanges();
 
         return newSupplier;
     }    
