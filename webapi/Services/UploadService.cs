@@ -30,7 +30,7 @@ public class UploadService
         return uploadResult.Name;
     }
 
-    public async Task<JsonDocument> TriggerWorkflow(string userId, string filename)
+    public async Task<JsonDocument> TriggerWorkflow(string token, string filename)
     {
         var url = "https://workflowexecutions.googleapis.com/v1/projects/receiptify-438806/locations/us-central1/workflows/receipt-upload/executions";
 
@@ -38,7 +38,7 @@ public class UploadService
         {
             argument = JsonSerializer.Serialize(new
             {
-                userId,
+                token,
                 filename
             })
         };

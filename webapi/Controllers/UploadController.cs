@@ -62,7 +62,14 @@ public class UploadController : ControllerBase
         // use uid and filename to trigger workflow
         try
         {
-            var result = await _uploadService.TriggerWorkflow(userId, filename);
+            Request.Cookies.TryGetValue("token", out var token);
+
+            if (token is null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error extracting cookie");
+            }
+
+            var result = await _uploadService.TriggerWorkflow(token, filename);
 
             return Ok(result);
         }
