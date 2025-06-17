@@ -28,6 +28,11 @@ public class ExpenseController : ControllerBase
     public ActionResult<Expense> GetById(int id)
     {
         var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }        
         
         var expense = _service.GetById(id);
 

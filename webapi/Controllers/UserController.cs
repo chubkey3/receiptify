@@ -49,8 +49,8 @@ public class UserController : ControllerBase
 
         if (userId is null)
         {
-            return Unauthorized("User not found.");            
-        }
+            return Unauthorized("Cookie not valid.");
+        }        
 
         var user = new User
         {
@@ -88,8 +88,8 @@ public class UserController : ControllerBase
 
         if (userId is null)
         {
-            return Unauthorized("User not found.");            
-        }
+            return Unauthorized("Cookie not valid.");
+        }        
 
         var user = _service.GetById(userId);
 

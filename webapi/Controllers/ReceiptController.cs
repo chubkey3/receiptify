@@ -20,7 +20,7 @@ public class ReceiptController : ControllerBase
 
     [HttpGet]
     public IEnumerable<Receipt> GetAll()
-    {
+    {                
         return _service.GetAll();
     }
 
