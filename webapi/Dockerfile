@@ -8,5 +8,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
 WORKDIR /app
 COPY --from=build /app/out .
-EXPOSE 5134
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "webapi.dll"]
