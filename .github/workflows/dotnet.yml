@@ -17,6 +17,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Restore firebase-service-account.json
+      run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > webapi/firebase-service-account.json
+
     - name: Set up Docker
       uses: docker/setup-buildx-action@v3
 
