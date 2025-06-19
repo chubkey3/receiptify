@@ -11,26 +11,44 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class ReceiptController : ControllerBase
 {
+    private readonly IWebHostEnvironment _env;
     ReceiptService _service;
 
-    public ReceiptController(ReceiptService service)
+    public ReceiptController(IWebHostEnvironment env, ReceiptService service)
     {
         _service = service;
+        _env = env;
     }
 
     [HttpGet]
-    public IEnumerable<Receipt> GetAll()
+    public IActionResult GetAll()
     {                
-        return _service.GetAll();
+        if (!_env.IsDevelopment())
+        {
+            return Unauthorized("This endpoint is only available in development.");
+        }
+        return Ok(_service.GetAll());
     }
 
     [HttpGet("{id}")]
     public ActionResult<Receipt> GetById(int id)
     {
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }          
+
         var receipt = _service.GetById(id);
 
         if (receipt is not null)
         {
+            if (receipt.UploadedBy != null && receipt.UploadedBy != userId)
+            {                
+                return Unauthorized("You do not have permission to view this receipt.");
+            }
+
             return receipt;
         }
         else
@@ -62,10 +80,22 @@ public class ReceiptController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }        
+
         var receipt = _service.GetById(id);
 
         if (receipt is not null)
         {
+            if (receipt != null && receipt.UploadedBy != userId)
+            {
+                return Unauthorized("You do not have permission to delete this receipt.");
+            }
+
             _service.DeleteById(id);
             return Ok();
         }

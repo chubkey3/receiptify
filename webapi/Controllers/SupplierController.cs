@@ -11,17 +11,23 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class SupplierController : ControllerBase
 {
+    private readonly IWebHostEnvironment _env;
     SupplierService _service;
 
-    public SupplierController(SupplierService service)
+    public SupplierController(IWebHostEnvironment env, SupplierService service)
     {
         _service = service;
+        _env = env;
     }
 
     [HttpGet]
-    public IEnumerable<Supplier> GetAll()
+    public IActionResult GetAll()
     {
-        return _service.GetAll();
+        if (!_env.IsDevelopment())
+        {
+            return Unauthorized("This endpoint is only available in development.");
+        }
+        return Ok(_service.GetAll());
     }
 
     [HttpGet("{id}")]
@@ -67,6 +73,11 @@ public class SupplierController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        if (!_env.IsDevelopment())
+        {
+            return Unauthorized("This endpoint is only available in development.");
+        }
+
         var Supplier = _service.GetById(id);
 
         if (Supplier is not null)

@@ -1,29 +1,20 @@
 using webapi.Services;
 using Microsoft.AspNetCore.Mvc;
-using FirebaseAdmin.Auth;
 
 namespace webapi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class UploadController : ControllerBase
-{
-    FirebaseAuthService _authService;
+{    
     UploadService _uploadService;        
 
-    public UploadController(FirebaseAuthService service, UploadService service2)
-    {
-        _authService = service;
-        _uploadService = service2;
+    public UploadController(UploadService service)
+    { 
+        _uploadService = service;
     }
 
 
-
-    [HttpGet]
-    public IActionResult Test()
-    {
-        return Ok();
-    }
 
     [HttpPost]
     public async Task<IActionResult> Upload([FromForm] IFormFile file)
@@ -59,13 +50,13 @@ public class UploadController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, $"Error uploading image: {ex.Message}");
         }
 
-        // use uid and filename to trigger workflow
+        // use firebase token and filename to trigger workflow
         try
         {
             Request.Cookies.TryGetValue("token", out var token);
 
             if (token is null)
-            {
+            {                
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error extracting cookie");
             }
 

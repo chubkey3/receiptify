@@ -11,17 +11,23 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class ExpenseController : ControllerBase
 {
+    private readonly IWebHostEnvironment _env;
     ExpenseService _service;
 
-    public ExpenseController(ExpenseService service)
+    public ExpenseController(IWebHostEnvironment env, ExpenseService service)
     {
         _service = service;
+        _env = env;
     }
 
     [HttpGet]
-    public IEnumerable<Expense> GetAll()
-    {
-        return _service.GetAll();
+    public IActionResult GetAll()
+    {        
+        if (!_env.IsDevelopment())
+        {
+            return Unauthorized("This endpoint is only available in development.");
+        }
+        return Ok(_service.GetAll());
     }
     
     [HttpGet("{id}")]
@@ -81,10 +87,22 @@ public class ExpenseController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }        
+
         var expense = _service.GetById(id);
 
         if (expense is not null)
         {
+            if (expense.Uid != userId)
+            {
+                return Unauthorized("You do not have permission to delete this expense.");
+            }
+
             _service.DeleteById(id);
             return Ok();
         }

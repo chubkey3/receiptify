@@ -6,7 +6,7 @@ using webapi.DTO;
 namespace webapi.Controllers;
 
     public class TokenRequest {
-    public string IdToken { get; set; }
+    public string IdToken { get; set; } = null!;
 }
 
 

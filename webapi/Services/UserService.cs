@@ -48,6 +48,21 @@ public class UserService
     {
          return _context.Expenses
         .Where(e => e.Uid == userId)
+        .Include(e => e.Supplier) // Include related Supplier        
+        .Select(e => new Expense
+        {
+            ExpenseId = e.ExpenseId,
+            TotalAmount = e.TotalAmount,
+            ExpenseDate = e.ExpenseDate,   
+            Uid = e.Uid,
+            SupplierId = e.SupplierId,
+            ReceiptId = e.ReceiptId,         
+            Supplier = new Supplier
+            {
+                SupplierId = e.Supplier.SupplierId,
+                SupplierName = e.Supplier.SupplierName
+            }               
+        })
        .AsNoTracking()
        .ToList();        
             

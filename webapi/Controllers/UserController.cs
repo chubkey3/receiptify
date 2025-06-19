@@ -12,26 +12,39 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
+    private readonly IWebHostEnvironment _env;
     UserService _service;
 
-    public UserController(UserService service)
+    public UserController(IWebHostEnvironment env, UserService service)
     {
         _service = service;
+        _env = env;
+    }
+
+    [HttpGet("all")]
+    public IActionResult GetAll()
+    {
+        if (!_env.IsDevelopment())
+        {
+            return Unauthorized("This endpoint is only available in development.");
+        }
+        return Ok(_service.GetAll());
     }
 
     [HttpGet]
-    public IEnumerable<User> GetAll()
+    public ActionResult<User> GetById()
     {
-        return _service.GetAll();
-    }
+        var userId = HttpContext.Items["userId"]?.ToString();
 
-    [HttpGet("{id}")]
-    public ActionResult<User> GetById(string id)
-    {
-        var user = _service.GetById(id);
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }        
+
+        var user = _service.GetById(userId);
 
         if (user is not null)
-        {
+        {            
             return user;
         }
         else
@@ -64,14 +77,26 @@ public class UserController : ControllerBase
     }
 
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(string id)
+    [HttpDelete]
+    public IActionResult Delete()
     {
-        var user = _service.GetById(id);
+        var userId = HttpContext.Items["userId"]?.ToString();
+
+        if (userId is null)
+        {
+            return Unauthorized("Cookie not valid.");
+        }        
+
+        var user = _service.GetById(userId);
 
         if (user is not null)
         {
-            _service.DeleteById(id);
+            if (user.Uid != userId)
+            {
+                return Unauthorized("You do not have permission to delete this user.");
+            }
+
+            _service.DeleteById(userId);
             return Ok();
         }
         else
