@@ -51,11 +51,12 @@ public class SessionController : ControllerBase
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddHours(1)
         };
 
         Response.Cookies.Append("token", request.IdToken, options);
+        
         return Ok();
     }
 }
