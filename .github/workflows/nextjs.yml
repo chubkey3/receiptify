@@ -13,13 +13,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      NEXT_PUBLIC_IDENTITY_PLATFORM_API_KEY: ${{ secrets.NEXT_PUBLIC_IDENTITY_PLATFORM_API_KEY }}
-      NEXT_PUBLIC_IDENTITY_PLATFORM_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_IDENTITY_PLATFORM_AUTH_DOMAIN }}      
+    #env:
+    #  NEXT_PUBLIC_IDENTITY_PLATFORM_API_KEY: ${{ secrets.NEXT_PUBLIC_IDENTITY_PLATFORM_API_KEY }}
+    #  NEXT_PUBLIC_IDENTITY_PLATFORM_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_IDENTITY_PLATFORM_AUTH_DOMAIN }}      
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3    
+    
+    - name: Create .env.production
+      run: |
+        echo "NEXT_PUBLIC_IDENTITY_PLATFORM_API_KEY=${{ secrets.NEXT_PUBLIC_IDENTITY_PLATFORM_API_KEY }}" >> ./frontend/.env.production
+        echo "NEXT_PUBLIC_IDENTITY_PLATFORM_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_IDENTITY_PLATFORM_AUTH_DOMAIN }}" >> ./frontend/.env.production
+
 
     - name: Set up Docker
       uses: docker/setup-buildx-action@v3
