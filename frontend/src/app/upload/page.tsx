@@ -1,6 +1,6 @@
 "use client"
 
-import axios from 'axios';
+import axios from "@/util/axios";
 import { useState } from 'react';
 
 export default function FileUpload() {
@@ -40,7 +40,7 @@ export default function FileUpload() {
     setStatusMessage("Loading...");
 
     try {            
-      response = await axios.post('http://localhost:5134/upload', formData, {withCredentials: true});      
+      response = await axios.post('/upload', formData);      
             
     } catch (error) {      
       setStatusMessage(`File Upload Failed!\nStatus Code: ${response?.status}\n Error: ${error}`);

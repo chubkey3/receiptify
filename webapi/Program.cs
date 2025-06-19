@@ -37,7 +37,7 @@ else
     builder.Services.AddCors(p => p.AddPolicy("CORSPolicy", builder =>
     {
         // please remove url soon
-        builder.WithOrigins("https://receiptify-573080908500.us-central1.run.app").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+        builder.WithOrigins("https://receiptify-frontend-573080908500.us-central1.run.app").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     }));
 }
 

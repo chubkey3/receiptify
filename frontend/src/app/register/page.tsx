@@ -1,7 +1,7 @@
 "use client"
 import styles from "../page.module.css";
 import { deleteCurrentUser, registerWithEmailAndPassword } from '@/util/authService';
-import axios from "axios";
+import axios from "@/util/axios";
 import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
 import { refreshSessionCookie } from "../auth/AuthHelper";

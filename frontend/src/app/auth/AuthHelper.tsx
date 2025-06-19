@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { auth } from '@/init/firebaseAuthInit';
-import axios from 'axios';
+import axios from '@/util/axios'
 
 export function AuthHelper() {
   useEffect(() => {    
@@ -36,7 +36,7 @@ export function AuthHelper() {
 
 export async function refreshSessionCookie(idToken: string) {
   try {
-    await axios.post('http://localhost:5134/session/refresh', {IdToken: idToken}, {withCredentials: true})    
+    await axios.post('/session/refresh', {IdToken: idToken}) 
   } catch (err) {
     console.error('Failed to refresh session cookie:', err);
   }
