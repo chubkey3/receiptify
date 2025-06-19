@@ -1,28 +1,43 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Build and Deploy ASP.NET Core to Cloud Run
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
+
+env:
+  SERVICE_NAME: receiptify-backend
+  IMAGE_NAME: gcr.io/aspnetapp
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
       with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+        credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+
+    - name: Configure Docker to use Artifact Registry
+      run: gcloud auth configure-docker gcr.io --quiet
+
+    - name: Build Docker image
+      run: docker build -t $IMAGE_NAME ./webapi
+
+    - name: Push Docker image
+      run: docker push $IMAGE_NAME
+
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: ${{ env.SERVICE_NAME }}
+        image: ${{ env.IMAGE_NAME }}
+        region: ${{ secrets.GCP_REGION }}
+        allow-unauthenticated: true
