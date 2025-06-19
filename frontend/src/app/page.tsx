@@ -1,15 +1,16 @@
-import { cookies } from "next/headers";
-import { auth } from "@/init/firebaseAdminAuthInit";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import FeatureCard from "@/components/feature-card";
 
 export default async function Home() {      
   
-  const token = (await cookies()).get('token')?.value;  
+  //const token = (await cookies()).get('token')?.value;  
 
-  let loggedIn = false;
+  const loggedIn = false;
 
+
+  // REPLACE WITH GET /user instead
+  /*
   try {
     await auth.verifyIdToken(token ?? '');
     loggedIn = true;
@@ -18,6 +19,7 @@ export default async function Home() {
     console.log(err)
     loggedIn = false;
   }    
+    */
     
 
   return (
@@ -62,8 +64,7 @@ export default async function Home() {
             <div className="flex">
               <FeatureCard/>
             </div>
-        </div>    
-        <img src="https://storage.cloud.google.com/receiptify/images/9c9c6a6f-cd57-4687-ba56-2a5f2071dc1e.jpg"/>
+        </div>            
     </main>
     </body>
   );

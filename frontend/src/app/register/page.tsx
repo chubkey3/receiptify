@@ -18,7 +18,7 @@ export default function Register() {
     .then((user) => {
       user.getIdToken().then((token) => {
         
-        refreshSessionCookie(token).then(() => router.push('/')).then(() => {
+        refreshSessionCookie(token).then(() => {
           axios.post('/user', {Email: email, Username: userName})
         .then(() => {            
           router.push('/');            

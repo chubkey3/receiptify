@@ -1,0 +1,43 @@
+name: Build and Deploy Next.js to Cloud Run
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  SERVICE_NAME: receiptify-frontend
+  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/receiptify-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3    
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+
+    - name: Configure Docker to use Artifact Registry
+      run: gcloud auth configure-docker gcr.io --quiet
+
+    - name: Build Docker image
+      run: docker build -t $IMAGE_NAME ./frontend
+
+    - name: Push Docker image
+      run: docker push $IMAGE_NAME
+
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: ${{ env.SERVICE_NAME }}
+        image: ${{ env.IMAGE_NAME }}
+        region: ${{ secrets.GCP_REGION }}
+        allow-unauthenticated: true
