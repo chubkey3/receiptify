@@ -7,7 +7,7 @@ on:
 
 env:
   SERVICE_NAME: receiptify-backend
-  IMAGE_NAME: gcr.io/aspnetapp
+  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/aspnetapp
 
 jobs:
   deploy:
