@@ -14,25 +14,25 @@ public class ReceiptService
 
     public IEnumerable<Receipt> GetAll()
     {
-         return _context.Receipts
-        .AsNoTracking()
-        .ToList();
+        return _context.Receipts
+       .AsNoTracking()
+       .ToList();
     }
 
     public Receipt? GetById(int id)
     {
-        return _context.Receipts     
+        return _context.Receipts
         .AsNoTracking()
         .SingleOrDefault(p => p.ReceiptId == id);
     }
 
     public Receipt? Create(Receipt newReceipt)
     {
-          _context.Receipts.Add(newReceipt);
-         _context.SaveChanges();
+        _context.Receipts.Add(newReceipt);
+        _context.SaveChanges();
 
         return newReceipt;
-    }    
+    }
 
     public void DeleteById(int id)
     {
@@ -41,6 +41,6 @@ public class ReceiptService
         {
             _context.Receipts.Remove(receiptToDelete);
             _context.SaveChanges();
-        }        
+        }
     }
 }

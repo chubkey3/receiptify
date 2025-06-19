@@ -67,14 +67,14 @@ public class UploadService
         // *****
 
         // TODO: REMOVE POLLING & REPLACE WITH PUB/SUB, cloud functions, and SignalR event driven pipeline
-        
-        
+
+
         var response = await client.PostAsync(url, content);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadAsStringAsync();
 
-        var json = JsonDocument.Parse(result);   
+        var json = JsonDocument.Parse(result);
         var executionName = json.RootElement.GetProperty("name").GetString();
 
         if (executionName != null && executionName.Length != 0)
@@ -95,16 +95,16 @@ public class UploadService
                     // workflow results are empty
                     throw new Exception("Workflow Error");
                 }
-                
 
-                
+
+
             }
             catch
             {
                 // workflow failed or cancelled
                 throw new Exception("Failed to poll results.");
             }
-        
+
         }
         else
         {

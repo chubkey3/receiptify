@@ -11,7 +11,7 @@ public class ParseCookieMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        
+
         if (context.Request.Cookies.TryGetValue("token", out var cookieValue))
         {
             try
@@ -42,7 +42,7 @@ public class ParseCookieMiddleware
     }
 
     private async Task<string> ParseCookie(string cookieValue)
-    {        
+    {
         // load credentials
         if (cookieValue == null)
         {
@@ -63,6 +63,6 @@ public class ParseCookieMiddleware
         {
             throw new Exception("Failed to parse cookie", ex);
         }
-        
+
     }
 }

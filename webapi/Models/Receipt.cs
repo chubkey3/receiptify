@@ -9,14 +9,14 @@ namespace webapi.Models;
 public partial class Receipt
 {
     [Key]
-        [Column("receipt_id")]
+    [Column("receipt_id")]
     public int ReceiptId { get; set; }
 
     [Column("upload_date")]
     public DateTime? UploadDate { get; set; }
 
     [Required, MaxLength(255)]
-        [Column("receipt_url")]
+    [Column("receipt_url")]
     public string ReceiptUrl { get; set; } = null!;
 
     [Column("uploaded_by")]

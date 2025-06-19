@@ -39,12 +39,12 @@ public class UserController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var user = _service.GetById(userId);
 
         if (user is not null)
-        {            
+        {
             return user;
         }
         else
@@ -57,13 +57,13 @@ public class UserController : ControllerBase
     [HttpPost]
     public IActionResult Create(CreateUserDto newUser)
     {
-        
+
         var userId = HttpContext.Items["userId"]?.ToString();
 
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var user = new User
         {
@@ -85,7 +85,7 @@ public class UserController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var user = _service.GetById(userId);
 
@@ -114,7 +114,7 @@ public class UserController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var user = _service.GetById(userId);
 

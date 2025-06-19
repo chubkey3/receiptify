@@ -52,7 +52,7 @@ public class SupplierController : ControllerBase
         // TODO: validate uid, Supplierid, and supplierid
 
         var exists = _service.GetByName(dto.SupplierName);
-        
+
         if (exists == null)
         {
             var Supplier = new Supplier

@@ -22,14 +22,14 @@ public class ExpenseController : ControllerBase
 
     [HttpGet]
     public IActionResult GetAll()
-    {        
+    {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
         }
         return Ok(_service.GetAll());
     }
-    
+
     [HttpGet("{id}")]
     public ActionResult<Expense> GetById(int id)
     {
@@ -38,14 +38,14 @@ public class ExpenseController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
-        
+        }
+
         var expense = _service.GetById(id);
 
         if (expense is not null)
-        {            
+        {
             if (expense.Uid != userId)
-            {                
+            {
                 return Unauthorized("You do not have permission to view this expense.");
             }
 
@@ -67,11 +67,11 @@ public class ExpenseController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var expense = new Expense
         {
-            TotalAmount = dto.TotalAmount,            
+            TotalAmount = dto.TotalAmount,
             // load foreign keys
             Uid = userId,
             ReceiptId = dto.ReceiptId,
@@ -79,7 +79,7 @@ public class ExpenseController : ControllerBase
         };
 
         _service.Create(expense);
-        
+
         return CreatedAtAction(nameof(GetById), new { id = expense!.Uid }, expense);
     }
 
@@ -92,7 +92,7 @@ public class ExpenseController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var expense = _service.GetById(id);
 

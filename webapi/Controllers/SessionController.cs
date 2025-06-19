@@ -5,7 +5,8 @@ using webapi.DTO;
 
 namespace webapi.Controllers;
 
-    public class TokenRequest {
+public class TokenRequest
+{
     public string IdToken { get; set; } = null!;
 }
 
@@ -14,18 +15,18 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class SessionController : ControllerBase
 {
-    
+
 
     public SessionController()
     {
-        
+
     }
 
 
 
     [HttpPost("login")]
     public IActionResult SessionLogin([FromBody] TokenRequest request)
-    {        
+    {
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
@@ -44,9 +45,10 @@ public class SessionController : ControllerBase
 
     public IActionResult SessionRefresh([FromBody] TokenRequest request)
     {
-    
 
-        var options = new CookieOptions {
+
+        var options = new CookieOptions
+        {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
@@ -56,4 +58,4 @@ public class SessionController : ControllerBase
         Response.Cookies.Append("token", request.IdToken, options);
         return Ok();
     }
-    }
+}

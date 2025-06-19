@@ -6,11 +6,11 @@ namespace webapi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class UploadController : ControllerBase
-{    
-    UploadService _uploadService;        
+{
+    UploadService _uploadService;
 
     public UploadController(UploadService service)
-    { 
+    {
         _uploadService = service;
     }
 
@@ -22,7 +22,7 @@ public class UploadController : ControllerBase
         // 1. load credentials
         // 2. upload image to GCS
         // 3. use uid and filename to trigger workflow
-        
+
         string filename;
 
         // load credentials
@@ -31,7 +31,7 @@ public class UploadController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         // upload image to GCS
         if (file == null || file.Length == 0)
@@ -56,7 +56,7 @@ public class UploadController : ControllerBase
             Request.Cookies.TryGetValue("token", out var token);
 
             if (token is null)
-            {                
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error extracting cookie");
             }
 
@@ -70,5 +70,5 @@ public class UploadController : ControllerBase
         }
     }
 
-    
+
 }

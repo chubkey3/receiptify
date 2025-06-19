@@ -14,14 +14,14 @@ public class SupplierService
 
     public IEnumerable<Supplier> GetAll()
     {
-         return _context.Suppliers
-        .AsNoTracking()
-        .ToList();
+        return _context.Suppliers
+       .AsNoTracking()
+       .ToList();
     }
 
     public Supplier? GetById(int id)
     {
-        return _context.Suppliers     
+        return _context.Suppliers
         .AsNoTracking()
         .SingleOrDefault(p => p.SupplierId == id);
     }
@@ -37,7 +37,7 @@ public class SupplierService
         _context.SaveChanges();
 
         return newSupplier;
-    }    
+    }
 
     public void DeleteById(int id)
     {
@@ -46,6 +46,6 @@ public class SupplierService
         {
             _context.Suppliers.Remove(supplierToDelete);
             _context.SaveChanges();
-        }        
+        }
     }
 }

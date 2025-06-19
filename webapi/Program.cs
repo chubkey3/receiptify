@@ -38,7 +38,7 @@ else
     {
         // please remove url soon
         builder.WithOrigins("https://receiptify-573080908500.us-central1.run.app").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-    }));    
+    }));
 }
 
 

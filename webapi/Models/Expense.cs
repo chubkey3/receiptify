@@ -9,25 +9,25 @@ namespace webapi.Models;
 public partial class Expense
 {
     [Key]
-        [Column("expense_id")]
+    [Column("expense_id")]
     public int ExpenseId { get; set; }
 
     [Required]
-        [Column("total_amount", TypeName = "decimal(10,2)")]
+    [Column("total_amount", TypeName = "decimal(10,2)")]
     public decimal TotalAmount { get; set; }
 
     [Column("expense_date")]
     public DateTime ExpenseDate { get; set; }
 
     [Required]
-        [Column("uid")]
+    [Column("uid")]
     public string Uid { get; set; } = null!;
 
     [Column("receipt_id")]
     public int? ReceiptId { get; set; }
 
     [Required]
-        [Column("supplier_id")]
+    [Column("supplier_id")]
     public int SupplierId { get; set; }
 
     [ForeignKey(nameof(ReceiptId))]

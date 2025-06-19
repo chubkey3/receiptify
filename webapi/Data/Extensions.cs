@@ -9,7 +9,7 @@ public static class Extensions
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ReceiptifyContext>();
-                context.Database.EnsureCreated();                
+                context.Database.EnsureCreated();
                 DbInitializer.Initialize(context);
             }
         }

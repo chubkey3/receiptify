@@ -22,7 +22,7 @@ public class ReceiptController : ControllerBase
 
     [HttpGet]
     public IActionResult GetAll()
-    {                
+    {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
@@ -38,14 +38,14 @@ public class ReceiptController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }          
+        }
 
         var receipt = _service.GetById(id);
 
         if (receipt is not null)
         {
             if (receipt.UploadedBy != null && receipt.UploadedBy != userId)
-            {                
+            {
                 return Unauthorized("You do not have permission to view this receipt.");
             }
 
@@ -65,14 +65,14 @@ public class ReceiptController : ControllerBase
 
         var receipt = new Receipt
         {
-            ReceiptUrl = dto.ReceiptUrl,            
-            
+            ReceiptUrl = dto.ReceiptUrl,
+
             // load foreign key (user.Uid) (optional)
-            UploadedBy = HttpContext.Items["userId"]?.ToString()           
+            UploadedBy = HttpContext.Items["userId"]?.ToString()
         };
 
         _service.Create(receipt);
-        
+
         return CreatedAtAction(nameof(GetById), new { id = receipt!.ReceiptId }, receipt);
     }
 
@@ -85,7 +85,7 @@ public class ReceiptController : ControllerBase
         if (userId is null)
         {
             return Unauthorized("Cookie not valid.");
-        }        
+        }
 
         var receipt = _service.GetById(id);
 

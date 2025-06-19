@@ -13,7 +13,7 @@ public partial class User
     public string Uid { get; set; } = null!;
 
     [Required]
-        [MaxLength(255)]
+    [MaxLength(255)]
     public string Username { get; set; } = null!;
 
     [Required]

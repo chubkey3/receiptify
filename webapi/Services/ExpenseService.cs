@@ -14,9 +14,9 @@ public class ExpenseService
 
     public IEnumerable<Expense> GetAll()
     {
-         return _context.Expenses
-        .AsNoTracking()
-        .ToList();
+        return _context.Expenses
+       .AsNoTracking()
+       .ToList();
     }
 
     public Expense? GetById(int id)
@@ -29,29 +29,29 @@ public class ExpenseService
         {
             ExpenseId = e.ExpenseId,
             TotalAmount = e.TotalAmount,
-            ExpenseDate = e.ExpenseDate,   
+            ExpenseDate = e.ExpenseDate,
             Uid = e.Uid,
             SupplierId = e.SupplierId,
-            ReceiptId = e.ReceiptId,         
+            ReceiptId = e.ReceiptId,
             Supplier = new Supplier
             {
                 SupplierId = e.Supplier.SupplierId,
                 SupplierName = e.Supplier.SupplierName
-            },            
+            },
             Receipt = e.Receipt == null ? null : new Receipt
             {
                 ReceiptId = e.Receipt.ReceiptId,
                 ReceiptUrl = e.Receipt.ReceiptUrl,
                 UploadDate = e.Receipt.UploadDate
-            }            
+            }
         })
         .SingleOrDefault(p => p.ExpenseId == id);
     }
 
     public Expense? Create(Expense newExpense)
     {
-          _context.Expenses.Add(newExpense);
-         _context.SaveChanges();
+        _context.Expenses.Add(newExpense);
+        _context.SaveChanges();
 
         return newExpense;
     }
@@ -63,6 +63,6 @@ public class ExpenseService
         {
             _context.Expenses.Remove(expenseToDelete);
             _context.SaveChanges();
-        }        
+        }
     }
 }
