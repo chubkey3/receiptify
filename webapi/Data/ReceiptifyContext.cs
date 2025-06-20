@@ -28,7 +28,14 @@ public partial class ReceiptifyContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("server=35.226.152.169;database=receiptify;user=testing;password=123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.31-mysql"));
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseMySql("server=35.226.152.169;database=receiptify;user=testing;password=123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.31-mysql"));      
+        }
+       
+    }
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

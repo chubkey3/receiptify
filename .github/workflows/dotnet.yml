@@ -17,6 +17,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+    
+    - name: Run Tests
+      run: dotnet test --no-build
+
     - name: Restore firebase-service-account.json
       run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > webapi/firebase-service-account.json
 
