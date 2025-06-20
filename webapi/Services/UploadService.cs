@@ -25,7 +25,7 @@ public class UploadService
 
         using var stream = file.OpenReadStream();
 
-        var uploadResult = await _storageService.UploadObjectAsync(bucketName, fileName, file.ContentType, stream);
+        var uploadResult = await _storageService.UploadObjectAsync(bucketName, fileName, file.ContentType, stream, new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead });
 
         return uploadResult.Name;
     }
