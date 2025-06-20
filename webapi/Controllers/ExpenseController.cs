@@ -71,7 +71,8 @@ public class ExpenseController : ControllerBase
 
         var expense = new Expense
         {
-            TotalAmount = dto.TotalAmount,
+            TotalAmount = dto.TotalAmount,            
+            ExpenseDate = dto.ExpenseDate ?? DateTime.Now, 
             // load foreign keys
             Uid = userId,
             ReceiptId = dto.ReceiptId,
