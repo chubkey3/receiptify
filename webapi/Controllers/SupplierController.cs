@@ -21,19 +21,19 @@ public class SupplierController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
         }
-        return Ok(_service.GetAll());
+        return Ok(await _service.GetAll());
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Supplier> GetById(int id)
+    public async Task<ActionResult<Supplier>> GetById(int id)
     {
-        var supplier = _service.GetById(id);
+        var supplier = await _service.GetById(id);
 
         if (supplier is not null)
         {
@@ -47,11 +47,11 @@ public class SupplierController : ControllerBase
 
 
     [HttpPost]
-    public IActionResult Create(CreateSupplierDto dto)
+    public async Task<IActionResult> Create(CreateSupplierDto dto)
     {
         // TODO: validate uid, Supplierid, and supplierid
 
-        var exists = _service.GetByName(dto.SupplierName);
+        var exists = await _service.GetByName(dto.SupplierName);
 
         if (exists == null)
         {
@@ -60,7 +60,7 @@ public class SupplierController : ControllerBase
                 SupplierName = dto.SupplierName
             };
 
-            _service.Create(Supplier);
+            await _service.Create(Supplier);
 
             return CreatedAtAction(nameof(GetById), new { id = Supplier!.SupplierId }, Supplier);
         }
@@ -71,18 +71,18 @@ public class SupplierController : ControllerBase
 
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
         }
 
-        var Supplier = _service.GetById(id);
+        var Supplier = await _service.GetById(id);
 
         if (Supplier is not null)
         {
-            _service.DeleteById(id);
+            await _service.DeleteById(id);
             return Ok();
         }
         else

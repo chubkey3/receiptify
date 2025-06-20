@@ -1,6 +1,7 @@
 using webapi.Models;
 using webapi.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace webapi.Services;
 
@@ -12,41 +13,41 @@ public class UserService
         _context = context;
     }
 
-    public IEnumerable<User> GetAll()
+    public async Task<IEnumerable<User>> GetAll()
     {
-        return _context.Users
+        return await _context.Users
        .AsNoTracking()
-       .ToList();
+       .ToListAsync();
     }
 
-    public User? GetById(string id)
+    public async Task<User?> GetById(string id)
     {
-        return _context.Users
+        return await _context.Users
         .AsNoTracking()
-        .SingleOrDefault(p => p.Uid == id);
+        .SingleOrDefaultAsync(p => p.Uid == id);
     }
 
-    public User? Create(User newUser)
+    public async Task<User?> Create(User newUser)
     {
-        _context.Users.Add(newUser);
-        _context.SaveChanges();
+        await _context.Users.AddAsync(newUser);
+        await _context.SaveChangesAsync();
 
         return newUser;
     }
 
-    public void DeleteById(string id)
+    public async Task DeleteById(string id)
     {
-        var userToDelete = _context.Users.Find(id);
+        var userToDelete = await _context.Users.FindAsync(id);
         if (userToDelete is not null)
         {
             _context.Users.Remove(userToDelete);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 
-    public IEnumerable<Expense> GetExpenses(string userId)
+    public async Task<IEnumerable<Expense>> GetExpenses(string userId)
     {
-        return _context.Expenses
+        return await _context.Expenses
        .Where(e => e.Uid == userId)
        .Include(e => e.Supplier) // Include related Supplier        
        .Select(e => new Expense
@@ -64,7 +65,7 @@ public class UserService
            }
        })
       .AsNoTracking()
-      .ToList();
+      .ToListAsync();
 
     }
 }

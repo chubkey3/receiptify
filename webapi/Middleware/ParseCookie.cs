@@ -27,16 +27,7 @@ public class ParseCookieMiddleware
                 return; // stop the pipeline
             }
 
-        }
-        /*
-        else
-        {
-            // No cookie provided
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Missing auth cookie");
-            return; // short-circuit
-        }
-        */
+        }        
 
         await _next(context);
     }

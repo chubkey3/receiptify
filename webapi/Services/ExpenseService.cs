@@ -12,16 +12,16 @@ public class ExpenseService
         _context = context;
     }
 
-    public IEnumerable<Expense> GetAll()
+    public async Task<IEnumerable<Expense>> GetAll()
     {
-        return _context.Expenses
+        return await _context.Expenses
        .AsNoTracking()
-       .ToList();
+       .ToListAsync();
     }
 
-    public Expense? GetById(int id)
+    public async Task<Expense?> GetById(int id)
     {
-        return _context.Expenses
+        return await _context.Expenses
         .AsNoTracking()
         .Include(e => e.Supplier) // Include related Supplier
         .Include(e => e.Receipt) // Include related Receipt
@@ -45,24 +45,24 @@ public class ExpenseService
                 UploadDate = e.Receipt.UploadDate
             }
         })
-        .SingleOrDefault(p => p.ExpenseId == id);
+        .SingleOrDefaultAsync(p => p.ExpenseId == id);
     }
 
-    public Expense? Create(Expense newExpense)
+    public async Task<Expense?> Create(Expense newExpense)
     {
-        _context.Expenses.Add(newExpense);
-        _context.SaveChanges();
+        await _context.Expenses.AddAsync(newExpense);
+        await _context.SaveChangesAsync();
 
         return newExpense;
     }
 
-    public void DeleteById(int id)
+    public async Task DeleteById(int id)
     {
-        var expenseToDelete = _context.Expenses.Find(id);
+        var expenseToDelete = await _context.Expenses.FindAsync(id);
         if (expenseToDelete is not null)
         {
             _context.Expenses.Remove(expenseToDelete);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

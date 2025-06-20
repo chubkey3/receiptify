@@ -12,40 +12,40 @@ public class SupplierService
         _context = context;
     }
 
-    public IEnumerable<Supplier> GetAll()
+    public async Task<IEnumerable<Supplier>> GetAll()
     {
-        return _context.Suppliers
+        return await _context.Suppliers
        .AsNoTracking()
-       .ToList();
+       .ToListAsync();
     }
 
-    public Supplier? GetById(int id)
+    public async Task<Supplier?> GetById(int id)
     {
-        return _context.Suppliers
+        return await _context.Suppliers
         .AsNoTracking()
-        .SingleOrDefault(p => p.SupplierId == id);
+        .SingleOrDefaultAsync(p => p.SupplierId == id);
     }
 
-    public Supplier? GetByName(string supplierName)
+    public async Task<Supplier?> GetByName(string supplierName)
     {
-        return _context.Suppliers.FirstOrDefault(u => u.SupplierName == supplierName);
+        return await _context.Suppliers.FirstOrDefaultAsync(u => u.SupplierName == supplierName);
     }
 
-    public Supplier? Create(Supplier newSupplier)
+    public async Task<Supplier?> Create(Supplier newSupplier)
     {
-        _context.Suppliers.Add(newSupplier);
-        _context.SaveChanges();
+        await _context.Suppliers.AddAsync(newSupplier);
+        await _context.SaveChangesAsync();
 
         return newSupplier;
     }
 
-    public void DeleteById(int id)
+    public async Task DeleteById(int id)
     {
-        var supplierToDelete = _context.Suppliers.Find(id);
+        var supplierToDelete = await _context.Suppliers.FindAsync(id);
         if (supplierToDelete is not null)
         {
             _context.Suppliers.Remove(supplierToDelete);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

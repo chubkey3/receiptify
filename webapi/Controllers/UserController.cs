@@ -2,6 +2,7 @@ using webapi.Services;
 using webapi.Models;
 using Microsoft.AspNetCore.Mvc;
 using webapi.DTO;
+using System.Threading.Tasks;
 
 namespace webapi.Controllers;
 
@@ -22,17 +23,17 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("all")]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
         }
-        return Ok(_service.GetAll());
+        return Ok(await _service.GetAll());
     }
 
     [HttpGet]
-    public ActionResult<User> GetById()
+    public async Task<ActionResult<User>> GetById()
     {
         var userId = HttpContext.Items["userId"]?.ToString();
 
@@ -41,7 +42,7 @@ public class UserController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var user = _service.GetById(userId);
+        var user = await _service.GetById(userId);
 
         if (user is not null)
         {
@@ -55,7 +56,7 @@ public class UserController : ControllerBase
 
 
     [HttpPost]
-    public IActionResult Create(CreateUserDto newUser)
+    public async Task<IActionResult> Create(CreateUserDto newUser)
     {
 
         var userId = HttpContext.Items["userId"]?.ToString();
@@ -72,13 +73,13 @@ public class UserController : ControllerBase
             Email = newUser.Email
         };
 
-        _service.Create(user);
+        await _service.Create(user);
         return CreatedAtAction(nameof(GetById), new { id = user!.Uid }, user);
     }
 
 
     [HttpDelete]
-    public IActionResult Delete()
+    public async Task<IActionResult> Delete()
     {
         var userId = HttpContext.Items["userId"]?.ToString();
 
@@ -87,7 +88,7 @@ public class UserController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var user = _service.GetById(userId);
+        var user = await _service.GetById(userId);
 
         if (user is not null)
         {
@@ -96,7 +97,7 @@ public class UserController : ControllerBase
                 return Unauthorized("You do not have permission to delete this user.");
             }
 
-            _service.DeleteById(userId);
+            await _service.DeleteById(userId);
             return Ok();
         }
         else
@@ -106,7 +107,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("expenses")]
-    public IActionResult GetExpenses()
+    public async Task<IActionResult> GetExpenses()
     {
 
         var userId = HttpContext.Items["userId"]?.ToString();
@@ -116,12 +117,12 @@ public class UserController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var user = _service.GetById(userId);
+        var user = await _service.GetById(userId);
 
         if (user is not null)
         {
 
-            var expenses = _service.GetExpenses(userId);
+            var expenses = await _service.GetExpenses(userId);
 
             return Ok(expenses);
         }

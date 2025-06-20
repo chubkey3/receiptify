@@ -21,17 +21,17 @@ public class ReceiptController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
         }
-        return Ok(_service.GetAll());
+        return Ok(await _service.GetAll());
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Receipt> GetById(int id)
+    public async Task<ActionResult<Receipt>> GetById(int id)
     {
         var userId = HttpContext.Items["userId"]?.ToString();
 
@@ -40,7 +40,7 @@ public class ReceiptController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var receipt = _service.GetById(id);
+        var receipt = await _service.GetById(id);
 
         if (receipt is not null)
         {
@@ -59,7 +59,7 @@ public class ReceiptController : ControllerBase
 
 
     [HttpPost]
-    public IActionResult Create(CreateReceiptDto dto)
+    public async Task<IActionResult> Create(CreateReceiptDto dto)
     {
         // TODO: validate uid, receiptid, and supplierid
 
@@ -71,14 +71,14 @@ public class ReceiptController : ControllerBase
             UploadedBy = HttpContext.Items["userId"]?.ToString()
         };
 
-        _service.Create(receipt);
+        await _service.Create(receipt);
 
         return CreatedAtAction(nameof(GetById), new { id = receipt!.ReceiptId }, receipt);
     }
 
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         var userId = HttpContext.Items["userId"]?.ToString();
 
@@ -87,7 +87,7 @@ public class ReceiptController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var receipt = _service.GetById(id);
+        var receipt = await _service.GetById(id);
 
         if (receipt is not null)
         {
@@ -96,7 +96,7 @@ public class ReceiptController : ControllerBase
                 return Unauthorized("You do not have permission to delete this receipt.");
             }
 
-            _service.DeleteById(id);
+            await _service.DeleteById(id);
             return Ok();
         }
         else

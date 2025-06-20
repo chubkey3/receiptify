@@ -21,17 +21,17 @@ public class ExpenseController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
         if (!_env.IsDevelopment())
         {
             return Unauthorized("This endpoint is only available in development.");
         }
-        return Ok(_service.GetAll());
+        return Ok(await _service.GetAll());
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Expense> GetById(int id)
+    public async Task<ActionResult<Expense>> GetById(int id)
     {
         var userId = HttpContext.Items["userId"]?.ToString();
 
@@ -40,7 +40,7 @@ public class ExpenseController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var expense = _service.GetById(id);
+        var expense = await _service.GetById(id);
 
         if (expense is not null)
         {
@@ -59,7 +59,7 @@ public class ExpenseController : ControllerBase
 
 
     [HttpPost]
-    public IActionResult Create(CreateExpenseDto dto)
+    public async Task<IActionResult> Create(CreateExpenseDto dto)
     {
         // TODO: validate uid, receiptid, and supplierid
         var userId = HttpContext.Items["userId"]?.ToString();
@@ -78,14 +78,14 @@ public class ExpenseController : ControllerBase
             SupplierId = dto.SupplierId
         };
 
-        _service.Create(expense);
+        await _service.Create(expense);
 
         return CreatedAtAction(nameof(GetById), new { id = expense!.Uid }, expense);
     }
 
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         var userId = HttpContext.Items["userId"]?.ToString();
 
@@ -94,7 +94,7 @@ public class ExpenseController : ControllerBase
             return Unauthorized("Cookie not valid.");
         }
 
-        var expense = _service.GetById(id);
+        var expense = await _service.GetById(id);
 
         if (expense is not null)
         {
@@ -103,7 +103,7 @@ public class ExpenseController : ControllerBase
                 return Unauthorized("You do not have permission to delete this expense.");
             }
 
-            _service.DeleteById(id);
+            await _service.DeleteById(id);
             return Ok();
         }
         else

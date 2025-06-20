@@ -12,35 +12,35 @@ public class ReceiptService
         _context = context;
     }
 
-    public IEnumerable<Receipt> GetAll()
+    public async Task<IEnumerable<Receipt>> GetAll()
     {
-        return _context.Receipts
+        return await _context.Receipts
        .AsNoTracking()
-       .ToList();
+       .ToListAsync();
     }
 
-    public Receipt? GetById(int id)
+    public async Task<Receipt?> GetById(int id)
     {
-        return _context.Receipts
+        return await _context.Receipts
         .AsNoTracking()
-        .SingleOrDefault(p => p.ReceiptId == id);
+        .SingleOrDefaultAsync(p => p.ReceiptId == id);
     }
 
-    public Receipt? Create(Receipt newReceipt)
+    public async Task<Receipt?> Create(Receipt newReceipt)
     {
-        _context.Receipts.Add(newReceipt);
-        _context.SaveChanges();
+        await _context.Receipts.AddAsync(newReceipt);
+        await _context.SaveChangesAsync();
 
         return newReceipt;
     }
 
-    public void DeleteById(int id)
+    public async Task DeleteById(int id)
     {
-        var receiptToDelete = _context.Receipts.Find(id);
+        var receiptToDelete = await _context.Receipts.FindAsync(id);
         if (receiptToDelete is not null)
         {
             _context.Receipts.Remove(receiptToDelete);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
