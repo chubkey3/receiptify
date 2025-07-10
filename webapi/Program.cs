@@ -29,7 +29,7 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddCors(p => p.AddPolicy("CORSPolicy", builder =>
     {
-        builder.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+        builder.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     }));
 }
 else

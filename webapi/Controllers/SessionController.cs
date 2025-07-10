@@ -30,8 +30,8 @@ public class SessionController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
+            Secure = true,            
+            SameSite = SameSiteMode.Lax,
             Expires = DateTime.UtcNow.AddHours(1)
         };
 
@@ -50,8 +50,8 @@ public class SessionController : ControllerBase
         var options = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
+            Secure = true,            
+            SameSite = SameSiteMode.Lax,
             Expires = DateTime.UtcNow.AddHours(1)
         };
 
