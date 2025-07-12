@@ -11,6 +11,8 @@ firebase-service-account.json
 
 postman-prerequest-script.js
 
+appsettings.Development.json
+
 # development SQL files
 *.sql
 
