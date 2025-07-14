@@ -4,7 +4,8 @@ using webapi.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using StackExchange.Redis;  
+using StackExchange.Redis;
+using System.Management;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,10 @@ builder.Services.AddDbContext<ReceiptifyContext>(options =>
 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 // connect Redis to app
-var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection") ?? "";
+var config = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisConnectionHost") ?? "");
+config.Password = builder.Configuration.GetConnectionString("RedisConnectionPassword") ?? "";
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(config));
 
 
 builder.Services.AddControllers();
