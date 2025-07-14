@@ -4,14 +4,20 @@ using webapi.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using StackExchange.Redis;  
 
 var builder = WebApplication.CreateBuilder(args);
 
 // connect DB to app
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 
 builder.Services.AddDbContext<ReceiptifyContext>(options =>
 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// connect Redis to app
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection") ?? "";
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 
 
 builder.Services.AddControllers();
@@ -24,6 +30,7 @@ builder.Services.AddScoped<ReceiptService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<UploadService>();
+builder.Services.AddScoped<AnalyticsService>();
 
 if (builder.Environment.IsDevelopment())
 {
