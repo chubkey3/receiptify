@@ -60,3 +60,4 @@ jobs:
         allow-unauthenticated: true
         env_vars: |
           ConnectionStrings__DefaultConnection=${{ secrets.DATABASE_CONNECTION_STRING }}
+          ConnectionStrings__RedisConnection=${{ secrets.REDIS_CONNECTION_STRING }}
