@@ -45,8 +45,10 @@ public class UserService
         }
     }
 
-    public async Task<IEnumerable<Expense>> GetExpenses(string userId)
+    public async Task<IEnumerable<Expense>> GetExpenses(string userId, int pageNumber)
     {
+        int pageSize = 25;
+
         return await _context.Expenses
        .Where(e => e.Uid == userId)
        .Include(e => e.Supplier) // Include related Supplier        
@@ -64,6 +66,9 @@ public class UserService
                SupplierName = e.Supplier.SupplierName
            }
        })
+      .OrderByDescending(e => e.ExpenseDate)
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
       .AsNoTracking()
       .ToListAsync();
 
