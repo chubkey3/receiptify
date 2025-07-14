@@ -3,8 +3,22 @@ using webapi.Data;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace webapi.Services;
+
+public class LineGraphExpensesType
+{
+    public DateTime ExpenseDate { get; set; }
+    public decimal TotalAmount { get; set; }
+}
+
+public class CircleGraphExpensesType {
+    public string SupplierName { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal GrandTotal { get; set; }
+}
+
 
 public class AnalyticsService
 {
@@ -16,7 +30,7 @@ public class AnalyticsService
         _context = context;
     }
 
-    public async Task SetUserCacheAsync(string userId, double amountSpent, double amountProjected, string topMerchant, double topMerchantAmount)
+    public async Task SetUserCacheAsync(string userId, double amountSpent, double amountProjected, string topMerchant, double topMerchantAmount, string lineGraphExpenses, string circleGraphExpenses)
     {
 
         var hashEntries = new HashEntry[]
@@ -24,7 +38,9 @@ public class AnalyticsService
             new HashEntry("amount_spent", amountSpent),
             new HashEntry("amount_projected", amountProjected),
             new HashEntry("top_merchant", topMerchant),
-            new HashEntry("top_merchant_amount", topMerchantAmount)
+            new HashEntry("top_merchant_amount", topMerchantAmount),
+            new HashEntry("line_graph_expenses", lineGraphExpenses),
+            new HashEntry("circle_graph_expenses", circleGraphExpenses)
         };
 
         await _redis.HashSetAsync($"user:{userId}", hashEntries);
@@ -38,13 +54,13 @@ public class AnalyticsService
 
         var results = await _redis.HashGetAsync($"user:{userId}", new RedisValue[]
         {
-            "amount_spent", "amount_projected", "top_merchant", "top_merchant_amount"
+            "amount_spent", "amount_projected", "top_merchant", "top_merchant_amount", "line_graph_expenses", "circle_graph_expenses"
         });
 
         // If all fields are null, cache miss
         if (results.All(r => r.IsNull))
         {
-            Console.WriteLine("Cache Miss!");            
+            Console.WriteLine("Cache Miss!");
             var summary = await Update(userId);
 
             return new JsonResult(summary);
@@ -57,7 +73,10 @@ public class AnalyticsService
         string topMerchant = results[2].IsNull ? "" : results[2].ToString();
         double topMerchantAmount = results[3].TryParse(out double topMerchantVal) ? topMerchantVal : 0.00;
 
-        return new JsonResult(new { amountSpent, amountProjected, topMerchant, topMerchantAmount });
+        List<LineGraphExpensesType>? line_graph_expenses = results[4].IsNull ? [] : JsonSerializer.Deserialize<List<LineGraphExpensesType>>(results[4].ToString());
+        List<CircleGraphExpensesType>? circle_graph_expenses = results[5].IsNull ? [] : JsonSerializer.Deserialize<List<CircleGraphExpensesType>>(results[5].ToString());
+
+        return new JsonResult(new { amountSpent, amountProjected, topMerchant, topMerchantAmount, line_graph_expenses, circle_graph_expenses });
     }
 
     public async Task<object> Update(string userId)
@@ -96,18 +115,53 @@ public class AnalyticsService
             .OrderByDescending(x => x.total_spent)
             .FirstOrDefaultAsync();
 
-        // update redis
+        // line graph
+        var lineGraphsExpenses = await _context.Expenses
+            .Where(e => e.ExpenseDate.Month == currentMonth &&
+                        e.ExpenseDate.Year == currentYear)
+            .Select(e => new
+            {
+                e.ExpenseDate,
+                e.TotalAmount
+            })
+            .OrderByDescending(x => x.ExpenseDate)
+            .ToListAsync();
 
-        await SetUserCacheAsync(userId, total_month ?? 0.00, projectedSpending ?? 0.00, topSupplier?.supplier_name ?? "", topSupplier?.total_spent ?? 0.00);
+
+        // pie chart        
+        var totalAmountThisMonth = await _context.Expenses
+            .Where(e => e.Uid == userId &&
+                        e.ExpenseDate.Month == currentMonth &&
+                        e.ExpenseDate.Year == currentYear)
+            .SumAsync(e => e.TotalAmount);
+
+        var circleGraphExpenses = await _context.Expenses
+            .Where(e => e.Uid == userId &&
+                        e.ExpenseDate.Month == currentMonth &&
+                        e.ExpenseDate.Year == currentYear)
+            .GroupBy(e => new { e.SupplierId, e.Supplier.SupplierName })
+            .Select(g => new
+            {
+                SupplierName = g.Key.SupplierName,
+                TotalAmount = g.Sum(e => e.TotalAmount),
+                GrandTotal = g.Sum(e => e.TotalAmount) / totalAmountThisMonth
+            })
+            .OrderByDescending(x => x.GrandTotal)
+            .ToListAsync();
+
+        // update redis
+        await SetUserCacheAsync(userId, total_month ?? 0.00, projectedSpending ?? 0.00, topSupplier?.supplier_name ?? "", topSupplier?.total_spent ?? 0.00, System.Text.Json.JsonSerializer.Serialize(lineGraphsExpenses) ?? "", System.Text.Json.JsonSerializer.Serialize(circleGraphExpenses) ?? "");
 
         return new
         {
             amountSpent = total_month ?? 0.00,
             amountProjected = projectedSpending ?? 0.00,
             topMerchant = topSupplier?.supplier_name ?? "",
-            topMerchantAmount = topSupplier?.total_spent ?? 0.00
+            topMerchantAmount = topSupplier?.total_spent ?? 0.00,
+            lineGraphsExpenses = lineGraphsExpenses ?? [],
+            circleGraphExpenses = circleGraphExpenses ?? []
         };
 
     }
-        
+
 }
