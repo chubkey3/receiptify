@@ -4,17 +4,18 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace webapi.Services;
 
 public class LineGraphExpensesType
 {
-    public DateTime ExpenseDate { get; set; }
+    public int Day { get; set; }
     public decimal TotalAmount { get; set; }
 }
 
 public class CircleGraphExpensesType {
-    public string SupplierName { get; set; }
+    public string SupplierName { get; set; } = null!;
     public decimal TotalAmount { get; set; }
     public decimal GrandTotal { get; set; }
 }
@@ -121,13 +122,35 @@ public class AnalyticsService
                         e.ExpenseDate.Year == currentYear)
             .Select(e => new
             {
-                e.ExpenseDate,
+                e.ExpenseDate.Day,
                 e.TotalAmount
             })
-            .OrderByDescending(x => x.ExpenseDate)
+            .OrderBy(x => x.Day)
             .ToListAsync();
 
+        var lineGraphsExpensesFormatted = new JsonArray();
 
+        decimal sum = 0;
+        var pos = 0;
+
+        for (int i = 1; i <= daysInMonth; i++)
+        {
+            while (pos < lineGraphsExpenses.Count && lineGraphsExpenses[pos].Day <= i)
+            {
+                // update aggregated sum up to day i
+                sum = sum + lineGraphsExpenses[pos].TotalAmount;
+                pos++;
+            }
+
+            var dayObj = new JsonObject
+            {
+                ["Day"] = i,
+                ["TotalAmount"] = sum
+            };
+
+            lineGraphsExpensesFormatted.Add(dayObj);
+        }
+        
         // pie chart        
         var totalAmountThisMonth = await _context.Expenses
             .Where(e => e.Uid == userId &&
@@ -150,7 +173,7 @@ public class AnalyticsService
             .ToListAsync();
 
         // update redis
-        await SetUserCacheAsync(userId, total_month ?? 0.00, projectedSpending ?? 0.00, topSupplier?.supplier_name ?? "", topSupplier?.total_spent ?? 0.00, System.Text.Json.JsonSerializer.Serialize(lineGraphsExpenses) ?? "", System.Text.Json.JsonSerializer.Serialize(circleGraphExpenses) ?? "");
+        await SetUserCacheAsync(userId, total_month ?? 0.00, projectedSpending ?? 0.00, topSupplier?.supplier_name ?? "", topSupplier?.total_spent ?? 0.00, System.Text.Json.JsonSerializer.Serialize(lineGraphsExpensesFormatted) ?? "", System.Text.Json.JsonSerializer.Serialize(circleGraphExpenses) ?? "");
 
         return new
         {
@@ -158,8 +181,8 @@ public class AnalyticsService
             amountProjected = projectedSpending ?? 0.00,
             topMerchant = topSupplier?.supplier_name ?? "",
             topMerchantAmount = topSupplier?.total_spent ?? 0.00,
-            lineGraphsExpenses = lineGraphsExpenses ?? [],
-            circleGraphExpenses = circleGraphExpenses ?? []
+            line_graph_expenses = lineGraphsExpensesFormatted ?? [],
+            circle_graph_expenses = circleGraphExpenses ?? []
         };
 
     }
