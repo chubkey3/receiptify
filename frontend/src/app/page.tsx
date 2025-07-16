@@ -23,7 +23,7 @@ export default async function Home() {
     
 
   return (
-    <body>
+    <div>
 
     
     <header className="w-full border-b border-gray-200 h-18 flex justify-between px-5 items-center">
@@ -66,6 +66,6 @@ export default async function Home() {
             </div>
         </div>            
     </main>
-    </body>
+    </div>
   );
 }
