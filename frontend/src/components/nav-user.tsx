@@ -29,6 +29,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useCallback } from "react"
+import { logout } from "@/util/authService"
+import axios from '@/util/axios'
+import { useRouter } from "next/navigation"
 
 export function NavUser({
   user,
@@ -40,6 +44,13 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+
+  const logoutUser = useCallback(() => {
+    logout().then(() => {
+      axios.post('/session/logout').then(() => router.push('/'))    
+    })
+  }, [])
 
   return (
     <SidebarMenu>
@@ -69,6 +80,7 @@ export function NavUser({
             align="end"
             sideOffset={4}
           >
+            {/*
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
@@ -82,8 +94,8 @@ export function NavUser({
                   </span>
                 </div>
               </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            </DropdownMenuLabel>*/}
+            {/*<DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <IconUserCircle />
@@ -98,8 +110,8 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuSeparator />*/}
+            <DropdownMenuItem onClick={logoutUser}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
