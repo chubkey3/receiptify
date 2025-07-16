@@ -1,6 +1,6 @@
 "use client"
 
-import { IconCirclePlusFilled, IconMail, IconReceipt, IconTrendingUp, type Icon } from "@tabler/icons-react"
+import { IconCirclePlusFilled, IconReceipt, type Icon } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -10,16 +10,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "./ui/drawer"
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "./ui/drawer"
 import { Separator } from "./ui/separator"
 import { Label } from "@radix-ui/react-label"
 import { Input } from "./ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useState } from "react"
 import axios from '@/util/axios'
 import { KeyedMutator } from "swr"
 import { toast } from "sonner"
+import Summary from "@/types/summary"
+import Expense from "@/types/expense"
 
 export function NavMain({
   items,
@@ -31,8 +31,8 @@ export function NavMain({
     url: string
     icon?: Icon
   }[],
-  analyticsMutate: KeyedMutator<any>,
-  expensesMutate: KeyedMutator<any>
+  analyticsMutate: KeyedMutator<{value: Summary}>,
+  expensesMutate: KeyedMutator<Expense[]>
 }) {
   return (
     <SidebarGroup>
@@ -66,7 +66,7 @@ export function NavMain({
   )
 }
 
-function UploadDrawer({analyticsMutate, expensesMutate}: {analyticsMutate: KeyedMutator<any>, expensesMutate: KeyedMutator<any>}) {
+function UploadDrawer({analyticsMutate, expensesMutate}: {analyticsMutate: KeyedMutator<{value: Summary}>, expensesMutate: KeyedMutator<Expense[]>}) {
   const [file, setFile] = useState<File>();  
   const [isLoading, toggleLoading] = useState<boolean>(false);
 

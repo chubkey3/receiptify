@@ -12,7 +12,7 @@ export default async function Home() {
   let status = 0
 
     try {    
-   let res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user`, {
+   const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user`, {
     headers: {
       Cookie: (await cookieStore).toString()
     },

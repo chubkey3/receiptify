@@ -2,26 +2,19 @@
 
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
+  IconCamera,  
   IconDatabase,
   IconFileAi,
   IconFileDescription,
-  IconFileWord,
-  IconFolder,
+  IconFileWord,  
   IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
+  IconInnerShadowTop,  
   IconReport,
   IconSearch,
-  IconSettings,
-  IconUsers,
+  IconSettings,  
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -34,6 +27,8 @@ import {
 } from "@/components/ui/sidebar"
 import axios from '@/util/axios'
 import useSWR, { KeyedMutator } from "swr"
+import Summary from "@/types/summary"
+import Expense from "@/types/expense"
 
 const data = {
   user: {
@@ -153,8 +148,8 @@ const data = {
 }
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-  analyticsMutate: KeyedMutator<any>; // or a more specific type if you know the data shape
-  expensesMutate: KeyedMutator<any>; // or a more specific type if you know the data shape
+  analyticsMutate: KeyedMutator<{value: Summary}>; // or a more specific type if you know the data shape
+  expensesMutate: KeyedMutator<Expense[]>; // or a more specific type if you know the data shape
 };
 
 export function AppSidebar({ analyticsMutate, expensesMutate, ...props }: AppSidebarProps) {
