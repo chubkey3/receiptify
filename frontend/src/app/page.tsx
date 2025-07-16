@@ -1,25 +1,37 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import FeatureCard from "@/components/feature-card";
-
-export default async function Home() {      
-  
-  //const token = (await cookies()).get('token')?.value;  
+import axios from "axios"
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+export default async function Home() {          
 
   const loggedIn = false;
+  const cookieStore = cookies();  
+  
+  let status = 0
 
+    try {    
+   let res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user`, {
+    headers: {
+      Cookie: (await cookieStore).toString()
+    },
+    validateStatus: () => true
+   })
 
-  // REPLACE WITH GET /user instead
-  /*
-  try {
-    await auth.verifyIdToken(token ?? '');
-    loggedIn = true;
+   if (res.status === 200) {
+    status = 200;
+   }
     
+
   } catch (err) {
-    console.log(err)
-    loggedIn = false;
-  }    
-    */
+    console.error("Failed to check user auth:", err);
+  }
+
+  if (status === 200) {      
+      redirect("/dashboard");
+    }
+  
     
 
   return (
