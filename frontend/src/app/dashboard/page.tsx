@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/sidebar"
 
 
-import { ChartPieLegend } from "@/components/chart-pie-legend"
-import { ChartAreaLinear } from "@/components/chart-area-linear"
 import axios from "@/util/axios";
 import useSWR from 'swr';
 import Summary from "@/types/summary"
@@ -43,15 +41,7 @@ export default function Page() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards data={data?.value} isLoading={isLoading}/>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="px-4 lg:px-6 w-full flex h-[400px]">
-                  <ChartAreaLinear data={data?.value} />            
-                </div>
-                <div className="px-4 lg:px-6 w-full flex h-[400px] ">
-                  <ChartPieLegend data={data?.value}/>
-                </div>
-              </div>
+              <SectionCards data={data?.value} isLoading={isLoading}/>              
               <DataTable data={expenses.data ? expenses.data : []} />
             </div>
           </div>

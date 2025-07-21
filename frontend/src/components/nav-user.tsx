@@ -1,12 +1,9 @@
 "use client"
 
-import {
-  IconCreditCard,
+import {  
   IconDotsVertical,
-  IconLogout,
-  IconNotification,
-  IconUser,
-  IconUserCircle,
+  IconLogout,  
+  IconUser,  
 } from "@tabler/icons-react"
 
 import {
@@ -16,11 +13,8 @@ import {
 } from "@/components/ui/avatar"
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenuContent,  
+  DropdownMenuItem,  
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -50,7 +44,7 @@ export function NavUser({
     logout().then(() => {
       axios.post('/session/logout').then(() => router.push('/'))    
     })
-  }, [])
+  }, [router])
 
   return (
     <SidebarMenu>

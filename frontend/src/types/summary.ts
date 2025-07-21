@@ -15,5 +15,7 @@ export default interface Summary {
       totalAmount: number,
       grandTotal: number
     }
-  ]
+  ],
+  percentChangeTotal: number,
+  percentChangeProjected: number
 }

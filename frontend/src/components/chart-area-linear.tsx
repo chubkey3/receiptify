@@ -1,6 +1,6 @@
 "use client"
 
-import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, Label, ReferenceLine, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -24,7 +24,7 @@ export const description = "A linear area chart"
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "var(--chart-1)",
+    color: "var(--chart-1)"    
   },
 } satisfies ChartConfig
 
@@ -41,11 +41,12 @@ export function ChartAreaLinear({data}: {data?: Summary}) {
         <ChartContainer config={chartConfig}>
           <AreaChart
             accessibilityLayer
-            data={data?.line_graph_expenses}
+            data={data?.line_graph_expenses}            
             margin={{
               left: 12,
               right: 12,
-            }}
+              top: 12
+            }}            
             
           >
             <CartesianGrid vertical={false} />
@@ -62,7 +63,17 @@ export function ChartAreaLinear({data}: {data?: Summary}) {
               axisLine={false}
               tickMargin={8}
             />
-              <ReferenceLine y={data?.amountProjected} stroke="red" strokeDasharray="4 4" />
+            <ReferenceLine y={data?.amountProjected} stroke="red" strokeDasharray="4 4">
+              <Label
+                value="Forecasted Monthly Cost"
+                position="top"
+                fill="white"
+                fontSize={12}
+                fontWeight="bold"
+                textAnchor="middle"    
+              />
+            </ReferenceLine>
+
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
