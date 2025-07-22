@@ -27,8 +27,7 @@ import {
   IconChevronsLeft,
   IconChevronsRight,  
   IconDotsVertical,  
-  IconLayoutColumns,
-  IconPlus,  
+  IconLayoutColumns  
 } from "@tabler/icons-react"
 import {
   ColumnDef,
@@ -56,8 +55,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
+  DropdownMenuItem,  
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
