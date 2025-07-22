@@ -7,8 +7,8 @@ import {
   IconFileAi,
   IconFileDescription,
   IconFileWord,  
-  IconHelp,
-  IconInnerShadowTop,  
+  IconHelp,  
+  IconReceipt,  
   IconReport,
   IconSearch,
   IconSettings,  
@@ -166,7 +166,7 @@ export function AppSidebar({ analyticsMutate, expensesMutate, ...props }: AppSid
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <IconInnerShadowTop className="!size-5" />
+                <IconReceipt className="!size-7" />
                 <span className="text-base font-semibold">Receiptify</span>
               </a>
             </SidebarMenuButton>

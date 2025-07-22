@@ -80,92 +80,12 @@ import {
   Tabs  
 } from "@/components/ui/tabs"
 import Expense from "@/types/expense"
+import axios from '@/util/axios'
+import { toast } from "sonner"
+import { KeyedMutator } from "swr"
+import Summary from "@/types/summary"
 
 
-const columns: ColumnDef<Expense>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center size-10">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => {
-      return (new Date(row.original.expenseDate)).toDateString();//<TableCellViewer item={row.original} />
-    },
-    enableHiding: false,
-  },
-  {
-    accessorKey: "supplier",
-    header: "Supplier",
-    cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.supplier.supplierName}
-        </Badge>
-      </div>
-    ),
-  },    
-  {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ row }) => {
-      const itemTotalAmount = row.original.totalAmount
-
-      if (itemTotalAmount !== 0) {
-        return row.original.totalAmount
-      }
-
-      return "0.00"
-    },
-  },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
 
 function DraggableRow({ row }: { row: Row<Expense> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -194,8 +114,12 @@ function DraggableRow({ row }: { row: Row<Expense> }) {
 
 export function DataTable({
   data: initialData,
+  analyticsMutate,
+  expensesMutate
 }: {
-  data: Expense[]
+  data: Expense[],
+  analyticsMutate: KeyedMutator<{value: Summary}>; // or a more specific type if you know the data shape
+  expensesMutate: KeyedMutator<Expense[]>; // or a more specific type if you know the data shape  
 }) {
   
   
@@ -223,6 +147,95 @@ export function DataTable({
     () => data?.map(({ expenseId }) => expenseId) || [],
     [data]
   )
+  
+  const deleteExpense = React.useCallback((expenseId: number) => {
+  axios.delete(`/expense/${expenseId}`).then(() => {
+    toast.success("Expense Deleted!", {position: "top-center"});
+    analyticsMutate();
+    expensesMutate();    
+    }).catch((err) => toast.error("Failed Deleting Expense!", {position: "top-center", description: err}));
+  }, []);
+
+  const columns: ColumnDef<Expense>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center size-10">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => {
+        return (new Date(row.original.expenseDate)).toDateString();//<TableCellViewer item={row.original} />
+      },
+      enableHiding: false,
+    },
+    {
+      accessorKey: "supplier",
+      header: "Supplier",
+      cell: ({ row }) => (
+        <div className="w-32">
+          <Badge variant="outline" className="text-muted-foreground px-1.5">
+            {row.original.supplier.supplierName}
+          </Badge>
+        </div>
+      ),
+    },    
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => {
+        const itemTotalAmount = row.original.totalAmount
+
+        if (itemTotalAmount !== 0) {
+          return row.original.totalAmount
+        }
+
+        return "0.00"
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+              size="icon"
+            >
+              <IconDotsVertical />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">                              
+            <DropdownMenuItem onClick={() => deleteExpense(row.original.expenseId)} variant="destructive">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ]  
 
   const table = useReactTable({
     data,
@@ -303,11 +316,7 @@ export function DataTable({
                   )
                 })}
             </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Add Section</span>
-          </Button>
+          </DropdownMenu>          
         </div>
       </div>
       <div      
