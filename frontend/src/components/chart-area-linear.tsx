@@ -1,94 +1,107 @@
-"use client"
-
-import { Area, AreaChart, CartesianGrid, Label, ReferenceLine, XAxis, YAxis } from "recharts"
+"use client";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,  
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+	Area,
+	AreaChart,
+	CartesianGrid,
+	Label,
+	ReferenceLine,
+	XAxis,
+	YAxis,
+} from "recharts";
+
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-import Summary from "@/types/summary"
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import {
+	ChartConfig,
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+} from "@/components/ui/chart";
+import Summary from "@/types/summary";
 
-export const description = "A linear area chart"
-
-
+export const description = "A linear area chart";
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)"    
-  },
-} satisfies ChartConfig
+	desktop: {
+		label: "Desktop",
+		color: "var(--chart-1)",
+	},
+} satisfies ChartConfig;
 
-export function ChartAreaLinear({data}: {data?: Summary}) {
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Monthly Spending</CardTitle>
-        <CardDescription>
-          Showing current and projected spending for {(new Date()).toLocaleString('default', {month: 'long'})}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={data?.line_graph_expenses}            
-            margin={{
-              left: 12,
-              right: 12,
-              top: 12
-            }}            
-            
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="day"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              //tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <YAxis
-            domain={[0, Math.ceil((data?.amountProjected ?? 0) / 50.0) * 50.0]}
-             tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ReferenceLine y={data?.amountProjected} stroke="red" strokeDasharray="4 4">
-              <Label
-                value="Forecasted Monthly Cost"
-                position="top"
-                fill="white"
-                fontSize={12}
-                fontWeight="bold"
-                textAnchor="middle"    
-              />
-            </ReferenceLine>
+export function ChartAreaLinear({ data }: { data?: Summary }) {
+	return (
+		<Card className="w-full">
+			<CardHeader>
+				<CardTitle>Monthly Spending</CardTitle>
+				<CardDescription>
+					Showing current and projected spending for{" "}
+					{new Date().toLocaleString("default", { month: "long" })}
+				</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<ChartContainer config={chartConfig}>
+					<AreaChart
+						accessibilityLayer
+						data={data?.line_graph_expenses}
+						margin={{
+							left: 12,
+							right: 12,
+							top: 12,
+						}}
+					>
+						<CartesianGrid vertical={false} />
+						<XAxis
+							dataKey="day"
+							tickLine={false}
+							axisLine={false}
+							tickMargin={8}
+							//tickFormatter={(value) => value.slice(0, 3)}
+						/>
+						<YAxis
+							domain={[
+								0,
+								Math.ceil((data?.amountProjected ?? 0) / 50.0) * 50.0,
+							]}
+							tickLine={false}
+							axisLine={false}
+							tickMargin={8}
+						/>
+						<ReferenceLine
+							y={data?.amountProjected}
+							stroke="red"
+							strokeDasharray="4 4"
+						>
+							<Label
+								value="Forecasted Monthly Cost"
+								position="top"
+								fill="white"
+								fontSize={12}
+								fontWeight="bold"
+								textAnchor="middle"
+							/>
+						</ReferenceLine>
 
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="dot" hideLabel />}
-            />
-            <Area
-              dataKey="totalAmount"
-              type="linear"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-      {/*<CardFooter>
+						<ChartTooltip
+							cursor={false}
+							content={<ChartTooltipContent indicator="dot" hideLabel />}
+						/>
+						<Area
+							dataKey="totalAmount"
+							type="linear"
+							fill="var(--color-desktop)"
+							fillOpacity={0.4}
+							stroke="var(--color-desktop)"
+						/>
+					</AreaChart>
+				</ChartContainer>
+			</CardContent>
+			{/*<CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
@@ -100,6 +113,6 @@ export function ChartAreaLinear({data}: {data?: Summary}) {
           </div>
         </div>
       </CardFooter>*/}
-    </Card>
-  )
+		</Card>
+	);
 }
