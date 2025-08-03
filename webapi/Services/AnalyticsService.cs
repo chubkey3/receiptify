@@ -51,10 +51,18 @@ public class AnalyticsService
             new HashEntry("top_merchant", topMerchant),
             new HashEntry("top_merchant_amount", topMerchantAmount),
             new HashEntry("line_graph_expenses", lineGraphExpenses),
-            new HashEntry("circle_graph_expenses", circleGraphExpenses),
-            new HashEntry("percent_change_total", percentChangeTotal),
-            new HashEntry("percent_change_projected", percentChangeProjected)
+            new HashEntry("circle_graph_expenses", circleGraphExpenses)            
         };
+
+        if (percentChangeTotal != null)
+        {
+            hashEntries.Append(new HashEntry("percent_change_total", percentChangeTotal));
+        }
+
+        if (percentChangeProjected != null)
+        {
+            hashEntries.Append(new HashEntry("percent_change_projected", percentChangeProjected));
+        }
 
         await _redis.HashSetAsync($"user:{userId}", hashEntries);
 
