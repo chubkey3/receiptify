@@ -82,7 +82,7 @@ export function ChartPieLegend({ data }: { data?: Summary }) {
 								/>
 							))}
 						</Pie>
-						<ChartLegend className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center" />
+						{(data?.amountSpent !== 0) && <ChartLegend className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center" />}
 					</PieChart>
 				</ChartContainer>
 			</CardContent>

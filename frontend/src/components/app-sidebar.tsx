@@ -147,16 +147,10 @@ const data = {
 	],
 };
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-	analyticsMutate: KeyedMutator<{ value: Summary }>; // or a more specific type if you know the data shape
-	expensesMutate: KeyedMutator<Expense[]>; // or a more specific type if you know the data shape
-};
 
 export function AppSidebar({
-	analyticsMutate,
-	expensesMutate,
 	...props
-}: AppSidebarProps) {
+}: React.ComponentProps<typeof Sidebar>) {
 	const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
 	const user = useSWR<{ username: string; email: string }>("/user", fetcher);
@@ -178,9 +172,7 @@ export function AppSidebar({
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain
-					analyticsMutate={analyticsMutate}
-					expensesMutate={expensesMutate}
+				<NavMain					
 					items={data.navMain}
 				/>
 				{/**<NavDocuments items={data.documents} />**/}

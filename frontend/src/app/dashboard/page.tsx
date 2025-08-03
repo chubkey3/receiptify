@@ -8,18 +8,16 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import axios from "@/util/axios";
 import useSWR from "swr";
 import Summary from "@/types/summary";
-import Expense from "@/types/expense";
 
 export default function Page() {
 	const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
-	const { data, error, isLoading, mutate } = useSWR<{ value: Summary }>(
+	const { data, error, isLoading } = useSWR<{ value: Summary }>(
 		"/analytics/summary",
 		fetcher,
 	);
-	const expenses = useSWR<Expense[]>("/user/expenses?pageNumber=1", fetcher);
 
-	//axios.get('analytics/summary')
+
 	if (error) return <p>Error: {error.message}</p>;
 
 	return (
@@ -32,9 +30,7 @@ export default function Page() {
 			}
 		>
 			<AppSidebar
-				variant="inset"
-				analyticsMutate={mutate}
-				expensesMutate={expenses.mutate}
+				variant="inset"				
 			/>
 			<SidebarInset>
 				<SiteHeader />
@@ -42,11 +38,7 @@ export default function Page() {
 					<div className="@container/main flex flex-1 flex-col gap-2">
 						<div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
 							<SectionCards data={data?.value} isLoading={isLoading} />
-							<DataTable
-								data={expenses.data ? expenses.data : []}
-								analyticsMutate={mutate}
-								expensesMutate={expenses.mutate}
-							/>
+							<DataTable/>
 						</div>
 					</div>
 				</div>

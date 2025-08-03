@@ -28,32 +28,24 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "./ui/input";
 import { useState } from "react";
 import axios from "@/util/axios";
-import { KeyedMutator } from "swr";
+import { mutate } from "swr";
 import { toast } from "sonner";
-import Summary from "@/types/summary";
-import Expense from "@/types/expense";
 
 export function NavMain({
-	items,
-	analyticsMutate,
-	expensesMutate,
+	items	
 }: {
 	items: {
 		title: string;
 		url: string;
 		icon?: Icon;
-	}[];
-	analyticsMutate: KeyedMutator<{ value: Summary }>;
-	expensesMutate: KeyedMutator<Expense[]>;
+	}[];	
 }) {
 	return (
 		<SidebarGroup>
 			<SidebarGroupContent className="flex flex-col gap-2">
 				<SidebarMenu>
 					<SidebarMenuItem className="flex items-center gap-2">
-						<UploadDrawer
-							analyticsMutate={analyticsMutate}
-							expensesMutate={expensesMutate}
+						<UploadDrawer							
 						/>
 						{/*<Button
               size="icon"
@@ -80,12 +72,8 @@ export function NavMain({
 	);
 }
 
-function UploadDrawer({
-	analyticsMutate,
-	expensesMutate,
-}: {
-	analyticsMutate: KeyedMutator<{ value: Summary }>;
-	expensesMutate: KeyedMutator<Expense[]>;
+function UploadDrawer({	
+}: {	
 }) {
 	const [file, setFile] = useState<File>();
 	const [isLoading, toggleLoading] = useState<boolean>(false);
@@ -128,9 +116,10 @@ function UploadDrawer({
 		}
 		toggleLoading(false);
 		if (response && response.status === 200) {
-			//update data
-			analyticsMutate();
-			expensesMutate();
+			//update data			
+			mutate("/analytics/summary")
+			mutate("/user/expenses?pageNumber=1")
+			
 
 			toast.success("Receipt uploaded successfully!", {
 				position: "top-center",

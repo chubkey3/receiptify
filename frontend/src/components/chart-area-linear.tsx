@@ -48,12 +48,7 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 				<ChartContainer config={chartConfig}>
 					<AreaChart
 						accessibilityLayer
-						data={data?.line_graph_expenses}
-						margin={{
-							left: 12,
-							right: 12,
-							top: 12,
-						}}
+						data={data?.line_graph_expenses}						
 					>
 						<CartesianGrid vertical={false} />
 						<XAxis
@@ -61,7 +56,7 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
-							//tickFormatter={(value) => value.slice(0, 3)}
+							tickFormatter={(value) => value % 2 == 0 ? "" : value}
 						/>
 						<YAxis
 							domain={[

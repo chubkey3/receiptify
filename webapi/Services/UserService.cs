@@ -2,9 +2,18 @@ using webapi.Models;
 using webapi.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace webapi.Services;
 
+public class PaginatedResponse<T>
+{
+    public int CurrentPage { get; set; }
+    public int PageSize {get; set;}
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+    public List<T> Items { get; set; }
+}
 public class UserService
 {
     private readonly ReceiptifyContext _context;
@@ -45,11 +54,14 @@ public class UserService
         }
     }
 
-    public async Task<IEnumerable<Expense>> GetExpenses(string userId, int pageNumber)
+    public async Task<PaginatedResponse<Expense>> GetExpenses(string userId, int pageNumber, int pageSize)
     {
-        int pageSize = 25;
 
-        return await _context.Expenses
+        var count = await _context.Expenses
+        .Where(e => e.Uid == userId)
+        .CountAsync();
+
+        var items = await _context.Expenses
        .Where(e => e.Uid == userId)
        .Include(e => e.Supplier) // Include related Supplier        
        .Select(e => new Expense
@@ -71,6 +83,15 @@ public class UserService
       .Take(pageSize)
       .AsNoTracking()
       .ToListAsync();
+
+        return new PaginatedResponse<Expense>
+        {
+            CurrentPage = pageNumber,
+            PageSize = pageSize,
+            TotalCount = count,
+            TotalPages = (int)Math.Ceiling((double)count / pageSize),
+            Items = items
+        };
 
     }
 }

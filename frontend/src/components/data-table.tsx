@@ -77,7 +77,7 @@ import { Tabs } from "@/components/ui/tabs";
 import Expense from "@/types/expense";
 import axios from "@/util/axios";
 import { toast } from "sonner";
-import { KeyedMutator } from "swr";
+import useSWR, { KeyedMutator, mutate } from "swr";
 import Summary from "@/types/summary";
 
 function DraggableRow({ row }: { row: Row<Expense> }) {
@@ -105,17 +105,28 @@ function DraggableRow({ row }: { row: Row<Expense> }) {
 	);
 }
 
-export function DataTable({
-	data: initialData,
-	analyticsMutate,
-	expensesMutate,
-}: {
-	data: Expense[];
-	analyticsMutate: KeyedMutator<{ value: Summary }>; // or a more specific type if you know the data shape
-	expensesMutate: KeyedMutator<Expense[]>; // or a more specific type if you know the data shape
-}) {
-	const [data, setData] = React.useState(() => initialData);
-	React.useEffect(() => setData(initialData), [initialData]);
+export function DataTable() {
+	const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+	const [data, setData] = React.useState<Expense[]>(() => []);
+	const [loading, setLoading] = React.useState<boolean>(true);
+		
+	const [pageIndex, setPageIndex] = React.useState(0);
+	const [pageSize, setPageSize] = React.useState(10);
+	const [pageCount, setPageCount] = React.useState(1);
+
+	const res = useSWR<{currentPage: number, pageSize: number, totalCount: number, totalPages: number, items: Expense[]}>(`/user/expenses?pageNumber=${pageIndex + 1}&pageSize=${pageSize}`, fetcher)
+
+	React.useEffect(() => {
+		setLoading(res.isLoading)
+		if (res.data) {
+			
+			setData(res.data.items ?? []);				
+			setPageCount(res.data.totalPages);
+		}
+		
+		
+	}, [res.data]);
+
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
 		React.useState<VisibilityState>({});
@@ -123,10 +134,7 @@ export function DataTable({
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-	const [pagination, setPagination] = React.useState({
-		pageIndex: 0,
-		pageSize: 10,
-	});
+	
 	const sortableId = React.useId();
 	const sensors = useSensors(
 		useSensor(MouseSensor, {}),
@@ -145,8 +153,8 @@ export function DataTable({
 				.delete(`/expense/${expenseId}`)
 				.then(() => {
 					toast.success("Expense Deleted!", { position: "top-center" });
-					analyticsMutate();
-					expensesMutate();
+					mutate("/analytics/summary");					
+					mutate(`/user/expenses?pageNumber=${pageIndex + 1}&pageSize=${pageSize}`)
 				})
 				.catch((err) =>
 					toast.error("Failed Deleting Expense!", {
@@ -155,7 +163,7 @@ export function DataTable({
 					}),
 				);
 		},
-		[analyticsMutate, expensesMutate],
+		[pageIndex, pageSize],
 	);
 
 	const columns: ColumnDef<Expense>[] = [
@@ -249,20 +257,29 @@ export function DataTable({
 	const table = useReactTable({
 		data,
 		columns,
+		pageCount,
 		state: {
 			sorting,
 			columnVisibility,
 			rowSelection,
 			columnFilters,
-			pagination,
+			pagination: {
+				pageIndex,
+				pageSize
+			},
 		},
+		manualPagination: true,
 		getRowId: (row) => row.expenseId.toString(),
 		enableRowSelection: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
 		onColumnVisibilityChange: setColumnVisibility,
-		onPaginationChange: setPagination,
+		onPaginationChange: (updater) => {
+			const next = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
+			setPageIndex(next.pageIndex);
+			setPageSize(next.pageSize);
+		},
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
@@ -355,9 +372,18 @@ export function DataTable({
 										})}
 									</TableRow>
 								))}
-							</TableHeader>
-							<TableBody className="**:data-[slot=table-cell]:first:w-8">
-								{table.getRowModel().rows?.length ? (
+							</TableHeader>							
+							<TableBody className="**:data-[slot=table-cell]:first:w-8">								
+								{(table.getRowModel().rows?.length === 0 && loading === false) ? (
+									<TableRow>
+										<TableCell
+											colSpan={columns.length}
+											className="h-24 text-center"
+										>
+											No expenses.
+										</TableCell>
+									</TableRow>
+								) : (
 									<SortableContext
 										items={dataIds}
 										strategy={verticalListSortingStrategy}
@@ -366,15 +392,6 @@ export function DataTable({
 											<DraggableRow key={row.id} row={row} />
 										))}
 									</SortableContext>
-								) : (
-									<TableRow>
-										<TableCell
-											colSpan={columns.length}
-											className="h-24 text-center"
-										>
-											No results.
-										</TableCell>
-									</TableRow>
 								)}
 							</TableBody>
 						</Table>
@@ -412,7 +429,7 @@ export function DataTable({
 						</div>
 						<div className="flex w-fit items-center justify-center text-sm font-medium">
 							Page {table.getState().pagination.pageIndex + 1} of{" "}
-							{table.getPageCount()}
+							{pageCount}
 						</div>
 						<div className="ml-auto flex items-center gap-2 lg:ml-0">
 							<Button

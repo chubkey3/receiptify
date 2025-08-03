@@ -107,7 +107,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("expenses")]
-    public async Task<IActionResult> GetExpenses(int pageNumber = 1)
+    public async Task<IActionResult> GetExpenses(int pageNumber = 1, int pageSize = 10)
     {
 
         var userId = HttpContext.Items["userId"]?.ToString();
@@ -121,7 +121,7 @@ public class UserController : ControllerBase
 
         if (user is not null)
         {
-            var expenses = await _service.GetExpenses(userId, pageNumber);
+            var expenses = await _service.GetExpenses(userId, pageNumber, pageSize);
 
             return Ok(expenses);
         }
