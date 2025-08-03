@@ -13,10 +13,12 @@ public class ExpenseController : ControllerBase
 {
     private readonly IWebHostEnvironment _env;
     ExpenseService _service;
+    AnalyticsService _service2;
 
-    public ExpenseController(IWebHostEnvironment env, ExpenseService service)
+    public ExpenseController(IWebHostEnvironment env, ExpenseService service, AnalyticsService service2)
     {
         _service = service;
+        _service2 = service2;
         _env = env;
     }
 
@@ -105,6 +107,10 @@ public class ExpenseController : ControllerBase
             }
 
             await _service.DeleteById(id);
+
+            // update analytics
+            await _service2.Update(userId);
+
             return Ok();
         }
         else
