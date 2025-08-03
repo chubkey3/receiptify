@@ -44,19 +44,16 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 					{new Date().toLocaleString("default", { month: "long" })}
 				</CardDescription>
 			</CardHeader>
-			<CardContent>				
+			<CardContent>
 				<ChartContainer config={chartConfig}>
-					<AreaChart
-						accessibilityLayer
-						data={data?.line_graph_expenses}						
-					>
+					<AreaChart accessibilityLayer data={data?.line_graph_expenses}>
 						<CartesianGrid vertical={false} />
 						<XAxis
 							dataKey="day"
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
-							tickFormatter={(value) => value % 2 == 0 ? "" : value}
+							tickFormatter={(value) => (value % 2 == 0 ? "" : value)}
 						/>
 						<YAxis
 							domain={[
@@ -66,15 +63,19 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
-							style={(data?.amountSpent === 0) ? {display: 'none'} : {}}							
+							style={data?.amountSpent === 0 ? { display: "none" } : {}}
 						/>
 						<ReferenceLine
 							y={data?.amountProjected}
-							stroke={(data?.amountSpent === 0) ? "" : "red"}
+							stroke={data?.amountSpent === 0 ? "" : "red"}
 							strokeDasharray="4 4"
 						>
 							<Label
-								value={(data?.amountSpent === 0) ? "Upload a receipt for this month to start tracking" : "Forecasted Monthly Cost"}
+								value={
+									data?.amountSpent === 0
+										? "Upload a receipt for this month to start tracking"
+										: "Forecasted Monthly Cost"
+								}
 								position="top"
 								fill="white"
 								fontSize={12}
@@ -83,16 +84,18 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 							/>
 						</ReferenceLine>
 
-						{(data?.amountSpent !== 0) && <ChartTooltip
-							cursor={false}
-							content={<ChartTooltipContent indicator="dot" hideLabel />}
-						/>}
+						{data?.amountSpent !== 0 && (
+							<ChartTooltip
+								cursor={false}
+								content={<ChartTooltipContent indicator="dot" hideLabel />}
+							/>
+						)}
 						<Area
 							dataKey="totalAmount"
 							type="linear"
 							fill="var(--color-desktop)"
 							fillOpacity={0.4}
-							style={(data?.amountSpent === 0) ? {display: 'none'} : {}}
+							style={data?.amountSpent === 0 ? { display: "none" } : {}}
 							stroke="var(--color-desktop)"
 							activeDot={data?.amountSpent !== 0}
 						/>

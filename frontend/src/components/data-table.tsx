@@ -77,8 +77,7 @@ import { Tabs } from "@/components/ui/tabs";
 import Expense from "@/types/expense";
 import axios from "@/util/axios";
 import { toast } from "sonner";
-import useSWR, { KeyedMutator, mutate } from "swr";
-import Summary from "@/types/summary";
+import useSWR, { mutate } from "swr";
 
 function DraggableRow({ row }: { row: Row<Expense> }) {
 	const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -109,23 +108,29 @@ export function DataTable() {
 	const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 	const [data, setData] = React.useState<Expense[]>(() => []);
 	const [loading, setLoading] = React.useState<boolean>(true);
-		
+
 	const [pageIndex, setPageIndex] = React.useState(0);
 	const [pageSize, setPageSize] = React.useState(10);
 	const [pageCount, setPageCount] = React.useState(1);
 
-	const res = useSWR<{currentPage: number, pageSize: number, totalCount: number, totalPages: number, items: Expense[]}>(`/user/expenses?pageNumber=${pageIndex + 1}&pageSize=${pageSize}`, fetcher)
+	const res = useSWR<{
+		currentPage: number;
+		pageSize: number;
+		totalCount: number;
+		totalPages: number;
+		items: Expense[];
+	}>(
+		`/user/expenses?pageNumber=${pageIndex + 1}&pageSize=${pageSize}`,
+		fetcher,
+	);
 
 	React.useEffect(() => {
-		setLoading(res.isLoading)
+		setLoading(res.isLoading);
 		if (res.data) {
-			
-			setData(res.data.items ?? []);				
+			setData(res.data.items ?? []);
 			setPageCount(res.data.totalPages);
 		}
-		
-		
-	}, [res.data]);
+	}, [res]);
 
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
@@ -134,7 +139,7 @@ export function DataTable() {
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-	
+
 	const sortableId = React.useId();
 	const sensors = useSensors(
 		useSensor(MouseSensor, {}),
@@ -153,8 +158,10 @@ export function DataTable() {
 				.delete(`/expense/${expenseId}`)
 				.then(() => {
 					toast.success("Expense Deleted!", { position: "top-center" });
-					mutate("/analytics/summary");					
-					mutate(`/user/expenses?pageNumber=${pageIndex + 1}&pageSize=${pageSize}`)
+					mutate("/analytics/summary");
+					mutate(
+						`/user/expenses?pageNumber=${pageIndex + 1}&pageSize=${pageSize}`,
+					);
 				})
 				.catch((err) =>
 					toast.error("Failed Deleting Expense!", {
@@ -265,7 +272,7 @@ export function DataTable() {
 			columnFilters,
 			pagination: {
 				pageIndex,
-				pageSize
+				pageSize,
 			},
 		},
 		manualPagination: true,
@@ -276,7 +283,10 @@ export function DataTable() {
 		onColumnFiltersChange: setColumnFilters,
 		onColumnVisibilityChange: setColumnVisibility,
 		onPaginationChange: (updater) => {
-			const next = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
+			const next =
+				typeof updater === "function"
+					? updater({ pageIndex, pageSize })
+					: updater;
 			setPageIndex(next.pageIndex);
 			setPageSize(next.pageSize);
 		},
@@ -372,9 +382,9 @@ export function DataTable() {
 										})}
 									</TableRow>
 								))}
-							</TableHeader>							
-							<TableBody className="**:data-[slot=table-cell]:first:w-8">								
-								{(table.getRowModel().rows?.length === 0 && loading === false) ? (
+							</TableHeader>
+							<TableBody className="**:data-[slot=table-cell]:first:w-8">
+								{table.getRowModel().rows?.length === 0 && loading === false ? (
 									<TableRow>
 										<TableCell
 											colSpan={columns.length}
@@ -428,8 +438,7 @@ export function DataTable() {
 							</Select>
 						</div>
 						<div className="flex w-fit items-center justify-center text-sm font-medium">
-							Page {table.getState().pagination.pageIndex + 1} of{" "}
-							{pageCount}
+							Page {table.getState().pagination.pageIndex + 1} of {pageCount}
 						</div>
 						<div className="ml-auto flex items-center gap-2 lg:ml-0">
 							<Button

@@ -104,8 +104,10 @@ export function SectionCards({
 					<CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
 						{isLoading ? (
 							<Skeleton className="h-[35px] w-[165px]" />
+						) : data?.topMerchant.length === 0 ? (
+							"N/A"
 						) : (
-							(data?.topMerchant.length === 0) ? "N/A" : data?.topMerchant
+							data?.topMerchant
 						)}
 					</CardTitle>
 				</CardHeader>

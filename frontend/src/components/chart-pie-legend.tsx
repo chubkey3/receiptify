@@ -15,8 +15,6 @@ import {
 	ChartLegend,
 } from "@/components/ui/chart";
 import Summary from "@/types/summary";
-import { Button } from "./ui/button";
-import { IconCirclePlusFilled } from "@tabler/icons-react";
 
 export const description = "A pie chart with a legend";
 
@@ -71,18 +69,34 @@ export function ChartPieLegend({ data }: { data?: Summary }) {
 				>
 					<PieChart>
 						<Pie
-							data={(data?.amountSpent === 0) ? [{supplierName: "Upload a receipt for this month to start tracking", totalAmount: 1, grandTotal:11}] : data?.circle_graph_expenses}
+							data={
+								data?.amountSpent === 0
+									? [
+											{
+												supplierName:
+													"Upload a receipt for this month to start tracking",
+												totalAmount: 1,
+												grandTotal: 11,
+											},
+										]
+									: data?.circle_graph_expenses
+							}
 							dataKey="totalAmount"
 							nameKey="supplierName"
 						>
-							{((data?.amountSpent === 0) ? [] : data?.circle_graph_expenses)?.map((entry, index) => (
+							{(data?.amountSpent === 0
+								? []
+								: data?.circle_graph_expenses
+							)?.map((entry, index) => (
 								<Cell
 									key={`cell-${index}`}
 									fill={COLORS[index % COLORS.length]}
 								/>
 							))}
 						</Pie>
-						{(data?.amountSpent !== 0) && <ChartLegend className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center" />}
+						{data?.amountSpent !== 0 && (
+							<ChartLegend className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center" />
+						)}
 					</PieChart>
 				</ChartContainer>
 			</CardContent>

@@ -17,7 +17,6 @@ export default function Page() {
 		fetcher,
 	);
 
-
 	if (error) return <p>Error: {error.message}</p>;
 
 	return (
@@ -29,16 +28,14 @@ export default function Page() {
 				} as React.CSSProperties
 			}
 		>
-			<AppSidebar
-				variant="inset"				
-			/>
+			<AppSidebar variant="inset" />
 			<SidebarInset>
 				<SiteHeader />
 				<div className="flex flex-1 flex-col">
 					<div className="@container/main flex flex-1 flex-col gap-2">
 						<div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
 							<SectionCards data={data?.value} isLoading={isLoading} />
-							<DataTable/>
+							<DataTable />
 						</div>
 					</div>
 				</div>

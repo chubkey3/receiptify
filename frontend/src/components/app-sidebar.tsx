@@ -26,9 +26,7 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import axios from "@/util/axios";
-import useSWR, { KeyedMutator } from "swr";
-import Summary from "@/types/summary";
-import Expense from "@/types/expense";
+import useSWR from "swr";
 
 const data = {
 	user: {
@@ -147,10 +145,7 @@ const data = {
 	],
 };
 
-
-export function AppSidebar({
-	...props
-}: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
 	const user = useSWR<{ username: string; email: string }>("/user", fetcher);
@@ -172,9 +167,7 @@ export function AppSidebar({
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain					
-					items={data.navMain}
-				/>
+				<NavMain items={data.navMain} />
 				{/**<NavDocuments items={data.documents} />**/}
 				{/**<NavSecondary items={data.navSecondary} className="mt-auto" />**/}
 			</SidebarContent>

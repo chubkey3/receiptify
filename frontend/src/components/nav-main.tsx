@@ -32,21 +32,20 @@ import { mutate } from "swr";
 import { toast } from "sonner";
 
 export function NavMain({
-	items	
+	items,
 }: {
 	items: {
 		title: string;
 		url: string;
 		icon?: Icon;
-	}[];	
+	}[];
 }) {
 	return (
 		<SidebarGroup>
 			<SidebarGroupContent className="flex flex-col gap-2">
 				<SidebarMenu>
 					<SidebarMenuItem className="flex items-center gap-2">
-						<UploadDrawer							
-						/>
+						<UploadDrawer />
 						{/*<Button
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"
@@ -72,9 +71,7 @@ export function NavMain({
 	);
 }
 
-function UploadDrawer({	
-}: {	
-}) {
+function UploadDrawer() {
 	const [file, setFile] = useState<File>();
 	const [isLoading, toggleLoading] = useState<boolean>(false);
 
@@ -116,10 +113,9 @@ function UploadDrawer({
 		}
 		toggleLoading(false);
 		if (response && response.status === 200) {
-			//update data			
-			mutate("/analytics/summary")
-			mutate("/user/expenses?pageNumber=1")
-			
+			//update data
+			mutate("/analytics/summary");
+			mutate("/user/expenses?pageNumber=1");
 
 			toast.success("Receipt uploaded successfully!", {
 				position: "top-center",
