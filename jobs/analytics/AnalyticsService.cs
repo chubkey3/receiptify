@@ -6,6 +6,16 @@ using System.Text.Json.Nodes;
 
 
 
+public class GetTopSupplierType
+{
+    public string supplier_name { get; set; }
+    public double? total_spent { get; set; }
+}
+
+public class PercentChangeType {
+    public double? percentChangeTotal { get; set; }
+    public double? percentChangeProjected { get; set; }
+}
 public class LineGraphExpensesType
 {
     public int Day { get; set; }
@@ -29,7 +39,7 @@ public class AnalyticsService
         _context = context;
     }
 
-    public async Task SetUserCacheAsync(string userId, double amountSpent, double amountProjected, string topMerchant, double topMerchantAmount, string lineGraphExpenses, string circleGraphExpenses)
+    public async Task SetUserCacheAsync(string userId, double amountSpent, double amountProjected, string topMerchant, double topMerchantAmount, string lineGraphExpenses, string circleGraphExpenses, double? percentChangeTotal, double? percentChangeProjected)
     {
 
         var hashEntries = new HashEntry[]
@@ -39,29 +49,33 @@ public class AnalyticsService
             new HashEntry("top_merchant", topMerchant),
             new HashEntry("top_merchant_amount", topMerchantAmount),
             new HashEntry("line_graph_expenses", lineGraphExpenses),
-            new HashEntry("circle_graph_expenses", circleGraphExpenses)
+            new HashEntry("circle_graph_expenses", circleGraphExpenses)            
         };
+
+        if (percentChangeTotal != null)
+        {
+            hashEntries.Append(new HashEntry("percent_change_total", percentChangeTotal));
+        }
+
+        if (percentChangeProjected != null)
+        {
+            hashEntries.Append(new HashEntry("percent_change_projected", percentChangeProjected));
+        }
 
         await _redis.HashSetAsync($"user:{userId}", hashEntries);
 
         // FUTURE: set TTL to 24 hours
         //await _db.KeyExpireAsync(key, TimeSpan.FromDays(7));
-    }    
+    }
 
-    public async Task<object> Update(string userId)
+    public async Task<double?> GetAmountSpent(string userId, int currentMonth, int currentYear)
     {
-        // run aggregations on userId and update Redis
-
-        var currentMonth = DateTime.Now.Month;
-        var currentYear = DateTime.Now.Year;
-
-        // amount spent this month
-        var total_month = await _context.Expenses
+        return await _context.Expenses
             .Where(e => e.Uid == userId && e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
             .SumAsync(e => (double?)e.TotalAmount);
+    }
 
-
-        // projected spenting this month
+    public async Task<double?> GetProjectedAmountSpent(string userId, int currentMonth, int currentYear) {
         var today = DateTime.Today;
         var currentDay = today.Day;
         var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
@@ -70,24 +84,30 @@ public class AnalyticsService
             .Where(e => e.Uid == userId && e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
             .SumAsync(e => (decimal?)e.TotalAmount) ?? 0;
 
-        var projectedSpending = (double?)Math.Round(daysInMonth * (sumThisMonth / currentDay), 2);
+        return (double?)Math.Round(daysInMonth * (sumThisMonth / currentDay), 2);
+    }
 
-        // most spent supplier and amount
-        var topSupplier = await _context.Expenses
+    public async Task<GetTopSupplierType?> GetTopSupplier(string userId, int currentMonth, int currentYear) {
+        return await _context.Expenses
             .Where(e => e.Uid == userId && e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
             .GroupBy(e => new { e.SupplierId, e.Supplier.SupplierName })
-            .Select(g => new
+            .Select(g => new GetTopSupplierType
             {
                 supplier_name = g.Key.SupplierName,
                 total_spent = (double?)Math.Round(g.Sum(e => e.TotalAmount), 2)
             })
             .OrderByDescending(x => x.total_spent)
             .FirstOrDefaultAsync();
+    }
 
-        // line graph
+    public async Task<JsonArray?> GetLineGraphExpenses(string userId, int currentMonth, int currentYear)
+    {
+        var daysInMonth = DateTime.DaysInMonth(currentYear, currentMonth);
+
         var lineGraphsExpenses = await _context.Expenses
             .Where(e => e.ExpenseDate.Month == currentMonth &&
-                        e.ExpenseDate.Year == currentYear)
+                        e.ExpenseDate.Year == currentYear &&
+                        e.Uid == userId)
             .Select(e => new
             {
                 e.ExpenseDate.Day,
@@ -118,8 +138,12 @@ public class AnalyticsService
 
             lineGraphsExpensesFormatted.Add(dayObj);
         }
-        
-        // pie chart        
+
+        return lineGraphsExpensesFormatted;
+
+    }
+    public async Task<List<CircleGraphExpensesType>?> GetPieGraphExpenses(string userId, int currentMonth, int currentYear)
+    {
         var totalAmountThisMonth = await _context.Expenses
             .Where(e => e.Uid == userId &&
                         e.ExpenseDate.Month == currentMonth &&
@@ -131,7 +155,7 @@ public class AnalyticsService
                         e.ExpenseDate.Month == currentMonth &&
                         e.ExpenseDate.Year == currentYear)
             .GroupBy(e => new { e.SupplierId, e.Supplier.SupplierName })
-            .Select(g => new
+            .Select(g => new CircleGraphExpensesType
             {
                 SupplierName = g.Key.SupplierName,
                 TotalAmount = g.Sum(e => e.TotalAmount),
@@ -140,8 +164,74 @@ public class AnalyticsService
             .OrderByDescending(x => x.GrandTotal)
             .ToListAsync();
 
+        return circleGraphExpenses;
+
+    }
+
+    public async Task<PercentChangeType?> GetPercentChange(string userId, int currentMonth, int currentYear, double total_month, double projectedSpending)
+    {
+        // 1 to 12
+        var lastMonth = currentMonth - 1;
+        var lastYear = currentYear;
+        if (lastMonth == 0)
+        {
+            lastMonth = 12;
+            lastYear = lastYear - 1;
+        }
+        
+        var lastMonthExpenses = await _context.Expenses
+            .Where(e => e.Uid == userId &&
+                        e.ExpenseDate.Month == lastMonth &&
+                        e.ExpenseDate.Year == lastYear)
+            .CountAsync();
+        
+        //  check if user has at least some expenses a m
+        if (lastMonthExpenses > 0)
+        {
+            // amount spent this month
+            var totalLastMonth = await GetAmountSpent(userId, lastMonth, lastYear);
+
+            // projected spenting this month
+            var lastMonthProjectedSpending = await GetProjectedAmountSpent(userId, lastMonth, lastYear);
+
+            return new PercentChangeType { percentChangeTotal = (total_month - totalLastMonth) / totalLastMonth * 100, percentChangeProjected = (projectedSpending - lastMonthProjectedSpending) / lastMonthProjectedSpending * 100 };
+        }
+        else
+        {
+            return null;
+        }
+
+        
+        
+    }
+
+    public async Task<object> Update(string userId)
+    {
+        // run aggregations on userId and update Redis
+
+        var currentMonth = DateTime.Now.Month;
+        var currentYear = DateTime.Now.Year;
+
+        // amount spent this month
+        var total_month = await GetAmountSpent(userId, currentMonth, currentYear);
+
+        // projected spenting this month
+        var projectedSpending = await GetProjectedAmountSpent(userId, currentMonth, currentYear);
+
+        // most spent supplier and amount
+        var topSupplier = await GetTopSupplier(userId, currentMonth, currentYear);
+
+        // line graph
+        var lineGraphsExpensesFormatted = await GetLineGraphExpenses(userId, currentMonth, currentYear);
+
+        // pie chart        
+        var circleGraphExpenses = await GetPieGraphExpenses(userId, currentMonth, currentYear);
+
+        // percent change
+        var percentChange = await GetPercentChange(userId, currentMonth, currentYear, total_month ?? 0.00, projectedSpending ?? 0.00);              
+
         // update redis
-        await SetUserCacheAsync(userId, total_month ?? 0.00, projectedSpending ?? 0.00, topSupplier?.supplier_name ?? "", topSupplier?.total_spent ?? 0.00, System.Text.Json.JsonSerializer.Serialize(lineGraphsExpensesFormatted) ?? "", System.Text.Json.JsonSerializer.Serialize(circleGraphExpenses) ?? "");
+        await SetUserCacheAsync(userId, total_month ?? 0.00, projectedSpending ?? 0.00, topSupplier?.supplier_name ?? "", topSupplier?.total_spent ?? 0.00, System.Text.Json.JsonSerializer.Serialize(lineGraphsExpensesFormatted) ?? "", System.Text.Json.JsonSerializer.Serialize(circleGraphExpenses) ?? "", percentChange?.percentChangeTotal ?? null, percentChange?.percentChangeProjected ?? null);
 
         return new
         {
@@ -150,7 +240,9 @@ public class AnalyticsService
             topMerchant = topSupplier?.supplier_name ?? "",
             topMerchantAmount = topSupplier?.total_spent ?? 0.00,
             line_graph_expenses = lineGraphsExpensesFormatted ?? [],
-            circle_graph_expenses = circleGraphExpenses ?? []
+            circle_graph_expenses = circleGraphExpenses ?? [],
+            percent_change_total = percentChange?.percentChangeTotal ?? null,
+            percent_change_projected = percentChange?.percentChangeProjected ?? null
         };
 
     }
