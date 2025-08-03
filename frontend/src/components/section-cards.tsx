@@ -105,7 +105,7 @@ export function SectionCards({
 						{isLoading ? (
 							<Skeleton className="h-[35px] w-[165px]" />
 						) : (
-							data?.topMerchant
+							(data?.topMerchant.length === 0) ? "N/A" : data?.topMerchant
 						)}
 					</CardTitle>
 				</CardHeader>

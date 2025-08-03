@@ -44,7 +44,7 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 					{new Date().toLocaleString("default", { month: "long" })}
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent>				
 				<ChartContainer config={chartConfig}>
 					<AreaChart
 						accessibilityLayer
@@ -71,14 +71,15 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
+							style={(data?.amountSpent === 0) ? {display: 'none'} : {}}							
 						/>
 						<ReferenceLine
 							y={data?.amountProjected}
-							stroke="red"
+							stroke={(data?.amountSpent === 0) ? "" : "red"}
 							strokeDasharray="4 4"
 						>
 							<Label
-								value="Forecasted Monthly Cost"
+								value={(data?.amountSpent === 0) ? "Upload a receipt for this month to start tracking" : "Forecasted Monthly Cost"}
 								position="top"
 								fill="white"
 								fontSize={12}
@@ -87,16 +88,18 @@ export function ChartAreaLinear({ data }: { data?: Summary }) {
 							/>
 						</ReferenceLine>
 
-						<ChartTooltip
+						{(data?.amountSpent !== 0) && <ChartTooltip
 							cursor={false}
 							content={<ChartTooltipContent indicator="dot" hideLabel />}
-						/>
+						/>}
 						<Area
 							dataKey="totalAmount"
 							type="linear"
 							fill="var(--color-desktop)"
 							fillOpacity={0.4}
+							style={(data?.amountSpent === 0) ? {display: 'none'} : {}}
 							stroke="var(--color-desktop)"
+							activeDot={data?.amountSpent !== 0}
 						/>
 					</AreaChart>
 				</ChartContainer>
