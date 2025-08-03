@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webapi", "webapi\webapi.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webapi.Tests", "webapi.Tests\webapi.Tests.csproj", "{16847678-4FF7-4F7D-8E22-4B4E207E8031}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "jobs", "jobs", "{8FACA5AE-6910-C0F8-C7AF-9A631EB1C11B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "analytics", "jobs\analytics\analytics.csproj", "{6E5DBB55-C92C-4824-B54C-9E721E621287}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,8 +45,23 @@ Global
 		{16847678-4FF7-4F7D-8E22-4B4E207E8031}.Release|x64.Build.0 = Release|Any CPU
 		{16847678-4FF7-4F7D-8E22-4B4E207E8031}.Release|x86.ActiveCfg = Release|Any CPU
 		{16847678-4FF7-4F7D-8E22-4B4E207E8031}.Release|x86.Build.0 = Release|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Debug|x64.Build.0 = Debug|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Debug|x86.Build.0 = Debug|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Release|x64.ActiveCfg = Release|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Release|x64.Build.0 = Release|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Release|x86.ActiveCfg = Release|Any CPU
+		{6E5DBB55-C92C-4824-B54C-9E721E621287}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6E5DBB55-C92C-4824-B54C-9E721E621287} = {8FACA5AE-6910-C0F8-C7AF-9A631EB1C11B}
 	EndGlobalSection
 EndGlobal
