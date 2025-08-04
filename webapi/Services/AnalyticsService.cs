@@ -44,7 +44,7 @@ public class AnalyticsService
     public async Task SetUserCacheAsync(string userId, double amountSpent, double amountProjected, string topMerchant, double topMerchantAmount, string lineGraphExpenses, string circleGraphExpenses, double? percentChangeTotal, double? percentChangeProjected)
     {
 
-        var hashEntries = new HashEntry[]
+        var hashEntries = new List<HashEntry>
         {
             new HashEntry("amount_spent", amountSpent),
             new HashEntry("amount_projected", amountProjected),
@@ -56,15 +56,15 @@ public class AnalyticsService
 
         if (percentChangeTotal != null)
         {
-            hashEntries.Append(new HashEntry("percent_change_total", percentChangeTotal));
+            hashEntries.Add(new HashEntry("percent_change_total", percentChangeTotal));
         }
 
         if (percentChangeProjected != null)
         {
-            hashEntries.Append(new HashEntry("percent_change_projected", percentChangeProjected));
+            hashEntries.Add(new HashEntry("percent_change_projected", percentChangeProjected));
         }
 
-        await _redis.HashSetAsync($"user:{userId}", hashEntries);
+        await _redis.HashSetAsync($"user:{userId}", hashEntries.ToArray());
 
         // FUTURE: set TTL to 24 hours
         //await _db.KeyExpireAsync(key, TimeSpan.FromDays(7));
@@ -229,7 +229,7 @@ public class AnalyticsService
             // projected spenting this month
             var lastMonthProjectedSpending = await GetProjectedAmountSpent(userId, lastMonth, lastYear);
             
-            return (PercentChangeType?)new JsonResult(new PercentChangeType{ percentChangeTotal = (total_month - totalLastMonth) / totalLastMonth * 100, percentChangeProjected = (projectedSpending - lastMonthProjectedSpending) / lastMonthProjectedSpending * 100 }).Value;
+            return new PercentChangeType{ percentChangeTotal = Math.Round((double)((total_month - totalLastMonth) / totalLastMonth * 100), 2), percentChangeProjected = Math.Round((double)((projectedSpending - lastMonthProjectedSpending) / lastMonthProjectedSpending * 100), 2) };
         }
         else
         {
