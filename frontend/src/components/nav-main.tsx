@@ -1,12 +1,7 @@
 "use client";
 
-import {
-	IconCirclePlusFilled,
-	IconReceipt,
-	type Icon,
-} from "@tabler/icons-react";
+import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
 import {
 	SidebarGroup,
 	SidebarGroupContent,
@@ -14,19 +9,9 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from "./ui/drawer";
-import { Separator } from "./ui/separator";
-import { Label } from "@radix-ui/react-label";
+
 import { Input } from "./ui/input";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "@/util/axios";
 import { mutate } from "swr";
 import { toast } from "sonner";
@@ -40,12 +25,106 @@ export function NavMain({
 		icon?: Icon;
 	}[];
 }) {
+	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	const handleClick = () => {
+		fileInputRef.current?.click();
+	};
+	const [file, setFile] = useState<File>();
+	const [isLoading, toggleLoading] = useState<boolean>(false);
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event.target.files && event.target.files.length > 0) {			
+			const file = event.target.files[0];
+			const img = new Image();
+			const imgURL = URL.createObjectURL(file);
+			img.src = imgURL;
+
+			img.onload = () => {
+				setFile(file);
+			};
+			img.onerror = () => {
+				setFile(undefined);
+			};
+		}
+	};
+
+	useEffect(() => {
+		if (!file) return;
+
+		const handleUpload = async () => {
+			if (!file) {
+				toast.error("No image found to upload.", { position: "top-center" });
+				return;
+			}
+			toggleLoading(true);
+
+			let response;
+			const formData = new FormData();
+
+			formData.append("file", file);
+
+			try {
+				response = await axios.post("/upload", formData);
+			} catch (error) {
+				toast.error("Image upload failed!", {
+					position: "top-center",
+					description: `Status Code: ${response?.status} | Error: ${error}`,
+				});
+			}
+			toggleLoading(false);
+			if (response && response.status === 200) {
+				//update data
+				mutate("/analytics/summary");
+				mutate("/user/expenses?pageNumber=1");
+
+				toast.success("Receipt uploaded successfully!", {
+					position: "top-center",
+				});
+			} else {
+				toast.error("Image upload failed!", {
+					position: "top-center",
+					description: `Status Code: ${response?.status} | Error: ${response?.statusText}`,
+				});
+			}
+		};
+
+		handleUpload();
+	}, [file]);
+
 	return (
 		<SidebarGroup>
 			<SidebarGroupContent className="flex flex-col gap-2">
 				<SidebarMenu>
 					<SidebarMenuItem className="flex items-center gap-2">
-						<UploadDrawer />
+						<Input
+							ref={fileInputRef}
+							style={{ display: "none" }}
+							onChange={handleFileChange}
+							accept="image/*"
+							type="file"
+							className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+						/>
+
+						<SidebarMenuButton
+							tooltip="Upload Receipt"
+							className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+							onClick={handleClick}
+						>
+							{isLoading ? (
+								<div className={"w-full flex justify-center"}>
+									<div
+										className={`h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent`}
+									/>
+								</div>
+							) : (
+								<>
+									<IconCirclePlusFilled />
+									<span>Upload Receipt</span>
+								</>
+							)}
+						</SidebarMenuButton>
+
 						{/*<Button
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"
@@ -71,6 +150,7 @@ export function NavMain({
 	);
 }
 
+/*
 function UploadDrawer() {
 	const [file, setFile] = useState<File>();
 	const [isLoading, toggleLoading] = useState<boolean>(false);
@@ -184,3 +264,4 @@ function UploadDrawer() {
 		</Drawer>
 	);
 }
+*/
